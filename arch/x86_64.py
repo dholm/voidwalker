@@ -25,3 +25,6 @@ class CpuX8664(Cpu):
 
     def __init__(self):
         super(CpuX8664, self).__init__(self._register_list)
+
+    def stack_pointer(self):
+        return self.register('rsp')

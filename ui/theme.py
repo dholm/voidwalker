@@ -18,33 +18,75 @@ import re
 
 from base.decorators import singleton
 
+
 class Theme(object):
-    _default_fg = None
-    _default_bg = None
-    _faces = None
     _ansi_escape_expression = re.compile((r'\x1B\[((\d+|"[^"]*")'
                                           r'(;(\d+|"[^"]*"))*)?'
                                           r'[A-Za-z]'))
 
-    def _add_face(self, face, fg=None, bg=None):
-        if not fg:
-            fg = self._default_fg
-        if not bg:
-            bg = self._default_bg
+    _colors_fmt = {8: '\x1b[%d;3%1d;4%1dm',
+                   16: '\x1b[%d;38;5;%d;48;5;%dm',
+                   256: '\x1b[%d;38;5;%d;48;5;%dm'}
+    _property_fmt = '\x1b[%dm'
 
-        self._faces[face] = '%s%s' % (fg, bg)
+    _properties = {'normal': 0,
+                   'bold': 1,
+                   'italic': 2,
+                   'underline': 4}
 
-    def __init__(self, default_foreground, default_background):
-        self._default_fg = default_foreground
-        self._default_bg = default_background
-        self._faces = {'face-none': '\x1b[0m',
-                       'face-bold': '\x1b[1m',
-                       'face-italic': '\x1b[2m',
-                       'face-underline': '\x1b[4m'}
-        self._add_face('face-default', default_foreground, default_background)
+    """Properties
+    normal     - normal face
+    bold
+    italic
+    underline
+    """
 
-    def reset(self):
-        return self._faces['face-none']
+    """Faces
+    face-normal
+    face-comment
+    face-constant   - string, char, number etc constants
+    face-identifier - variable/function name
+    face-statement  - statements (if, else, for etc)
+    face-define     - definitions (i.e. #define X)
+    face-type       - types (integer, static, struct etc)
+    face-special    - special symbols or characters
+    face-underlined - text that stands out (i.e. links)
+    face-error
+    face-attention  - anything that needs extra attention
+
+    face-header     - section headers etc
+    """
+
+    def _add_face(self, face, color, prop='normal'):
+        if prop in self._properties:
+            prop = self._properties[prop]
+
+        self._faces['face-' + face] = '%s%s' % (self._property_fmt % prop,
+                                                color)
+
+    def _color(self, depth, fg, bg, prop='normal'):
+        if prop in self._properties:
+            prop = self._properties[prop]
+        return (self._colors_fmt.get(depth, 8) %
+                (prop, fg, bg))
+
+    def __init__(self, default_color):
+        self._default_color = default_color
+
+        self._faces = {}
+        self._add_face('normal', default_color)
+        self._faces['face-reset'] = self.property('normal')
+
+    def property(self, name):
+        assert name in self._properties
+        return (self._property_fmt % self._properties[name])
+
+    def faces(self):
+        return self._faces
+
+    def face(self, name):
+        assert ('face-%s' % name) in self._faces
+        return self._faces.get('face-%s' % name, self._faces['face-normal'])
 
     def len(self, string, format_dictionary=None):
         d = self._faces
@@ -58,4 +100,24 @@ class Theme(object):
         if format_dictionary:
             d.update(format_dictionary)
 
-        return (self._faces['face-default'] + (string % d))
+        return '%s%s' % ((string % d), self.face('normal'))
+
+
+@singleton
+class ThemeManager(object):
+    _themes = {}
+
+    def themes(self):
+        return self._themes.iteritems()
+
+    def theme(self, name):
+        assert name in self._themes
+        return self._themes[name]
+
+    def add_theme(self, theme):
+        self._themes[theme.name()] = theme
+
+
+def register_theme(cls):
+    ThemeManager().add_theme(cls)
+    return cls

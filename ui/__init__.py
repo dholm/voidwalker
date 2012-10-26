@@ -18,3 +18,4 @@ import solarized
 import terminal
 import theme
 import widgets
+import zenburn

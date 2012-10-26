@@ -1,4 +1,4 @@
-# (void)walker base library
+# (void)walker user interface
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,13 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import gdb
 
-def singleton(cls):
-    instances = {}
-    def instance():
-        if cls not in instances:
-            instances[cls] = cls()
+from ui.terminal import Terminal
 
-        return instances[cls]
 
-    return instance
+class GdbTerminal(Terminal):
+    def __init__(self, theme):
+        width = gdb.parameter('width')
+        height = gdb.parameter('height')
+        depth = 256
+        super(GdbTerminal, self).__init__(theme, width, height, depth)
+
+    def write(self, string, dictionary=None):
+        gdb.write(self.theme().write(string, dictionary))

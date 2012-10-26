@@ -15,7 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import gdb
+
 from base.decorators import singleton
+
 
 @singleton
 class CommandManager(object):
@@ -28,6 +30,7 @@ class CommandManager(object):
 
     def add_command(self, command):
         self._commands[command.name()] = command
+
 
 def gdb_register_command(cls):
     CommandManager().add_command(cls)

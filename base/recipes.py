@@ -14,13 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from itertools import izip_longest
 
-def singleton(cls):
-    instances = {}
-    def instance():
-        if cls not in instances:
-            instances[cls] = cls()
 
-        return instances[cls]
-
-    return instance
+def grouper(n, iterable, fillvalue=None):
+    args = [iter(iterable)] * n
+    return izip_longest(*args, fillvalue=fillvalue)

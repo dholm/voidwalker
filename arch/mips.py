@@ -26,3 +26,6 @@ class CpuMips(Cpu):
 
     def __init__(self):
         super(CpuMips, self).__init__(self._register_list)
+
+    def stack_pointer(self):
+        return self.register('sp')

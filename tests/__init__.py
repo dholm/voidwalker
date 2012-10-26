@@ -1,4 +1,4 @@
-# (void)walker base library
+# (void)walker unit tests
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,13 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import unittest
 
-def singleton(cls):
-    instances = {}
-    def instance():
-        if cls not in instances:
-            instances[cls] = cls()
+import tests.theme
+import tests.widgets
 
-        return instances[cls]
 
-    return instance
+def suite():
+    loader = unittest.TestLoader()
+    test_suite = unittest.TestSuite()
+    test_suite.addTests(loader.loadTestsFromModule(tests.theme))
+    test_suite.addTests(loader.loadTestsFromModule(tests.widgets))
+    return test_suite

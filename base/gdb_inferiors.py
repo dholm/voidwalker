@@ -1,4 +1,4 @@
-# (void)walker framework
+# (void)walker base library
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@ import re
 from arch.arch import Architecture
 from base.decorators import singleton
 
+
 class Inferior(object):
     _gdb_inferior = None
     _cpu = None
@@ -40,9 +41,9 @@ class Inferior(object):
 @singleton
 class InferiorManager(object):
     _file_expression = re.compile((r'`(?P<path>[^\']+)\', '
-                                   r'file type (?P<target>[^\s]+).'))
+                                   r'file type (?P<target>\S+).'))
     _inferior_expression = re.compile((r'(?P<num>\d+)\s+'
-                                       r'(?P<description>[^\s]+ [^\s]*)\s+'
+                                       r'(?P<description>\S+ \S*)\s+'
                                        r'(?P<path>.+)$'))
 
     _inferiors = {}

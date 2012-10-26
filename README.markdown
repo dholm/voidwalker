@@ -26,11 +26,21 @@ your .gdbinit:
 The next time you start GDB you should see (void)walker being loaded.
 
 
+## Usage
+
+Dumping the context of the current stack frame:
+
+    pcontext
+
+
 ## Themes
 
 There is a theming system built in and the default theme is based on
 Ethan Schoonover's color palette known as
 [solarized](http://ethanschoonover.com/solarized).
+
+The [Zenburn](http://slinky.imukuppi.org/zenburnpage/) theme is included as
+well.
 
 
 ## License

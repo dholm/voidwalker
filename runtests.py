@@ -1,4 +1,6 @@
-# (void)walker base library
+#!/usr/bin/env python
+
+# (void)walker unit tests
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,13 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+import unittest
 
-def singleton(cls):
-    instances = {}
-    def instance():
-        if cls not in instances:
-            instances[cls] = cls()
+import tests
 
-        return instances[cls]
 
-    return instance
+if __name__ == '__main__':
+    print 'suite'
+    suite = tests.suite()
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    sys.exit({True: 0, False: 3}[result.wasSuccessful()])

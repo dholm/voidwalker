@@ -15,6 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import gdb
+from collections import OrderedDict
+
 
 class Register(object):
     _name = None
@@ -35,16 +37,25 @@ class Register(object):
     def value(self):
         value = gdb.parse_and_eval('$' + self._name)
         try:
-            return int(value)
+            return long(value)
         except gdb.error:
             return None
 
+
 class Cpu(object):
-    _registers = {}
+    _registers = None
 
     def __init__(self, register_list):
+        self._registers = OrderedDict()
         for name in iter(register_list):
             self._registers[name] = Register(name)
 
+    def register(self, name):
+        assert name in self._registers
+        return self._registers[name]
+
     def registers(self):
         return self._registers.iteritems()
+
+    def stack_pointer(self):
+        return None

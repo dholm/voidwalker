@@ -14,28 +14,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gdb
+import os
+from sys import stdout
+
 
 class Terminal(object):
     DEFAULT_WIDTH = 80
     DEFAULT_HEIGHT = 25
+    DEFAULT_DEPTH = 8
 
-    _width = DEFAULT_WIDTH
-    _height = DEFAULT_HEIGHT
-    _theme = None
-
-    def __init__(self, width, height, theme):
-        if width:
-            self._width = width
-        if height:
-            self._height = height
-        self._theme = theme
+    def __init__(self, theme, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT,
+                 depth=DEFAULT_DEPTH):
+        self._theme = theme(depth)
+        self._width = width
+        self._height = height
+        self._depth = depth
 
     def string_width(self, string, dictionary=None):
         return self._theme.len(string, dictionary)
 
+    def write(self, string, dictionary=None):
+        raise NotImplementedError()
+
     def reset(self):
-        self.write(self._theme.reset())
+        self.write(self._theme.property('normal'))
+
+    def depth(self):
+        return self._depth
 
     def width(self):
         return self._width
@@ -47,12 +52,12 @@ class Terminal(object):
         return self._theme
 
 
-class GdbTerminal(Terminal):
-
+class SysTerminal(Terminal):
     def __init__(self, theme):
-        width = gdb.parameter('width')
-        height = gdb.parameter('height')
-        super(GdbTerminal, self).__init__(width, height, theme)
+        width = int(os.popen('tput cols').read().strip())
+        height = int(os.popen('tput lines').read().strip())
+        depth = int(os.popen('tput colors').read().strip())
+        super(SysTerminal, self).__init__(theme, width, height, depth)
 
     def write(self, string, dictionary=None):
-        gdb.write(self.theme().write(string, dictionary))
+        stdout.write(self.theme().write(string, dictionary))

@@ -16,18 +16,20 @@
 
 import inspect
 import os.path
-sys.path.append(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))))
+import sys
+voidwalker_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
+sys.path.append(os.path.dirname(voidwalker_path))
 
 import cmds
 
-from base.inferiors import InferiorManager
-from ui.solarized import Solarized
-from ui.terminal import GdbTerminal
+from base.gdb_inferiors import InferiorManager
+from ui.theme import ThemeManager
+from ui.gdb_terminal import GdbTerminal
 
 version = '0.0.0'
 
-terminal = GdbTerminal(Solarized())
-terminal.write(('Loading %(face-emphasized)s(void)walker%(face-default)s '
-                'v%(version)s%(face-none)s\n'), {'version': version})
+terminal = GdbTerminal(ThemeManager().theme('solarized'))
+terminal.write(('Loading %(face-underlined)s(void)walker%(face-normal)s '
+                'v%(version)s%(face-reset)s\n'), {'version': version})
 
 cmds.commands.CommandManager().init(InferiorManager, terminal)
