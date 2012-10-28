@@ -88,34 +88,45 @@ class Theme(object):
         assert ('face-%s' % name) in self._faces
         return self._faces.get('face-%s' % name, self._faces['face-normal'])
 
+    def _filter_string(self, string):
+        string = string.expandtabs()
+        return string
+
     def len(self, string, format_dictionary=None):
         d = self._faces
         if format_dictionary:
             d.update(format_dictionary)
 
-        return len(self._ansi_escape_expression.sub('', (string % d)))
+        filtered = self._filter_string(string)
+        return len(self._ansi_escape_expression.sub('', (filtered % d)))
 
     def write(self, string, format_dictionary=None):
         d = self._faces
         if format_dictionary:
             d.update(format_dictionary)
 
-        return '%s%s' % ((string % d), self.face('normal'))
+        filtered = self._filter_string(string)
+        return '%s%s' % (self.face('normal'), (filtered % d))
 
 
 @singleton
 class ThemeManager(object):
     _themes = {}
+    _instances = {}
+
+    def init(self, depth):
+        for name, theme in self._themes.iteritems():
+            self._instances[name] = theme(depth)
 
     def themes(self):
-        return self._themes.iteritems()
+        return self._themes.iterkeys()
 
     def theme(self, name):
-        assert name in self._themes
-        return self._themes[name]
+        assert name in self._instances
+        return self._instances[name]
 
     def add_theme(self, theme):
-        self._themes[theme.name()] = theme
+        self._themes[theme.name().strip()] = theme
 
 
 def register_theme(cls):

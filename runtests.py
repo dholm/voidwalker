@@ -19,12 +19,21 @@
 import sys
 import unittest
 
+import interface
+import ui
 import tests
 
 
-if __name__ == '__main__':
-    print 'suite'
-    suite = tests.suite()
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-    sys.exit({True: 0, False: 3}[result.wasSuccessful()])
+def parameter_factory(parameter_type):
+    parameter = parameter_type()
+    parameter.value = parameter.default_value()
+    return parameter
+
+interface.parameters.ParameterManager().init(parameter_factory)
+terminal = ui.terminal.SysTerminal()
+ui.theme.ThemeManager().init(terminal.depth())
+
+suite = tests.suite()
+runner = unittest.TextTestRunner(verbosity=2)
+result = runner.run(suite)
+sys.exit({True: 0, False: 3}[result.wasSuccessful()])

@@ -30,7 +30,19 @@ The next time you start GDB you should see (void)walker being loaded.
 
 Dumping the context of the current stack frame:
 
-    pcontext
+    voidwalker context
+
+
+## Parameters
+
+Changing themes:
+
+    voidwalker-theme
+
+For instance, to set Zenburn as the default theme instead of Solarized add the
+following line to ~/.gdbinit:
+
+    set voidwalker-theme zenburn
 
 
 ## Themes

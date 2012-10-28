@@ -18,7 +18,8 @@ import gdb
 import os.path
 import re
 
-from arch.arch import Architecture
+from arch.architecture import Architecture
+from arch.architecture import ArchitectureFactory
 from base.decorators import singleton
 
 
@@ -92,7 +93,7 @@ class InferiorManager(object):
             assert inferior.num in inferiors
             target = inferiors[inferior.num]
             architecture = self._target_to_architecture(target)
-            cpu = Architecture.create_cpu(architecture)
+            cpu = ArchitectureFactory().create_cpu(architecture)
 
             self._inferiors[inferior.num] = Inferior({'gdb': inferior,
                                                       'cpu': cpu})

@@ -1,4 +1,4 @@
-# (void)walker hardware platform support
+# (void)walker application interface
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,20 +14,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from x86_64 import CpuX8664
-from mips import CpuMips
+from interface.parameters import ParameterEnum
+from interface.parameters import register_parameter
+from ui.theme import ThemeManager
 
-class Architecture:
-    X86    = 1
-    X86_64 = 2
-    MIPS   = 3
-    ARM    = 4
 
-    _cpu_map = {X86_64: CpuX8664,
-                MIPS: CpuMips}
+@register_parameter
+class ThemeParameter(ParameterEnum):
+    DEFAULT_VALUE = 'solarized'
+
+    show_doc = 'Voidwalker\'s theme is currently set to'
+
+    def __init__(self):
+        self._themes = [x for x in ThemeManager().themes()]
+        super(ThemeParameter, self).__init__()
+
+    def default_value(self):
+        return self.DEFAULT_VALUE
+
+    def init(self):
+        pass
+
+    def sequence(self):
+        return self._themes
 
     @staticmethod
-    def create_cpu(architecture):
-        assert architecture in Architecture._cpu_map
-
-        return Architecture._cpu_map.get(architecture, None)()
+    def name():
+        return '%s' % ('voidwalker-theme')

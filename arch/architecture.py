@@ -14,15 +14,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from cpu import Cpu
+from arch.x86_64 import CpuX8664
+from arch.mips import CpuMips
+from base.decorators import singleton
 
 
-class CpuX8664(Cpu):
-    _register_list = ('rax rbx rcx rdx rsi rdi rbp rsp r8 r9 r10 r11 r12 r13 '
-                      'r14 r15 rip cs ss ds es fs gs').split()
+class Architecture:
+    X86 = 1
+    X86_64 = 2
+    MIPS = 3
+    ARM = 4
 
-    def __init__(self, collector_factory):
-        super(CpuX8664, self).__init__(collector_factory, self._register_list)
 
-    def stack_pointer(self):
-        return self.register('rsp')
+@singleton
+class ArchitectureFactory:
+    _cpu_map = {Architecture.X86_64: CpuX8664,
+                Architecture.MIPS: CpuMips}
+
+    def __init__(self):
+        self._collector_factory = None
+
+    def init(self, collector_factory):
+        self._collector_factory = collector_factory
+
+    def create_cpu(self, architecture):
+        assert architecture in self._cpu_map
+        return self._cpu_map.get(architecture, None)(self._collector_factory)

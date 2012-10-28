@@ -14,13 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gdb
 from collections import OrderedDict
 
 
 class Register(object):
-    _name = None
-
     def __init__(self, name):
         self._name = name
 
@@ -28,27 +25,19 @@ class Register(object):
         return self._name
 
     def size(self):
-        size = gdb.parse_and_eval('sizeof($' + self._name + ')')
-        try:
-            return int(size)
-        except gdb.error:
-            return None
+        raise NotImplementedError
 
     def value(self):
-        value = gdb.parse_and_eval('$' + self._name)
-        try:
-            return long(value)
-        except gdb.error:
-            return None
+        raise NotImplementedError
 
 
 class Cpu(object):
     _registers = None
 
-    def __init__(self, register_list):
+    def __init__(self, collector_factory, register_list):
         self._registers = OrderedDict()
         for name in iter(register_list):
-            self._registers[name] = Register(name)
+            self._registers[name] = collector_factory.create_register(name)
 
     def register(self, name):
         assert name in self._registers

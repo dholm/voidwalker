@@ -20,16 +20,27 @@ import sys
 voidwalker_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 sys.path.append(os.path.dirname(voidwalker_path))
 
-import cmds
-
-from base.gdb_inferiors import InferiorManager
+from arch.architecture import ArchitectureFactory
+from interface.context import ContextCommand
+from interface.gdb_collector import GdbCollectorFactory
 from ui.theme import ThemeManager
+import interface
+import interface.gdb_command
+import interface.gdb_parameter
+
+
 from ui.gdb_terminal import GdbTerminal
 
 version = '0.0.0'
 
-terminal = GdbTerminal(ThemeManager().theme('solarized'))
-terminal.write(('Loading %(face-underlined)s(void)walker%(face-normal)s '
-                'v%(version)s%(face-reset)s\n'), {'version': version})
+interface.parameters.ParameterManager().init(interface.gdb_parameter.factory)
+ArchitectureFactory().init(GdbCollectorFactory())
 
-cmds.commands.CommandManager().init(InferiorManager, terminal)
+terminal = GdbTerminal()
+ThemeManager().init(terminal.depth())
+terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
+                'v%(version)s installed%(face-reset)s\n'),
+               {'version': version})
+
+interface.commands.CommandManager().init(interface.gdb_command.factory,
+                                         terminal)

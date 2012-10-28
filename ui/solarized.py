@@ -29,9 +29,8 @@ class Solarized(Theme):
                   256: [234, 235, 240, 241, 244, 245, 254, 230, 136, 166, 160,
                         125, 61, 33, 37, 64]}
 
-    _labels = ['base03', 'base02', 'base01', 'base00', 'base0', 'base1',
-               'base2', 'base3', 'yellow', 'orange', 'red', 'magenta',
-               'violet', 'blue', 'cyan', 'green']
+    _labels = ('base03 base02 base01 base00 base0 base1 base2 base3 yellow '
+               'orange red magenta violet blue cyan green').split()
 
     def __init__(self, depth):
         assert len(self._labels) == len(self._color_map.get(depth, 8))

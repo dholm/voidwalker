@@ -1,4 +1,4 @@
-# (void)walker hardware platform support
+# (void)walker application interface
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,15 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from cpu import Cpu
 
-
-class CpuX8664(Cpu):
-    _register_list = ('rax rbx rcx rdx rsi rdi rbp rsp r8 r9 r10 r11 r12 r13 '
-                      'r14 r15 rip cs ss ds es fs gs').split()
-
-    def __init__(self, collector_factory):
-        super(CpuX8664, self).__init__(collector_factory, self._register_list)
-
-    def stack_pointer(self):
-        return self.register('rsp')
+class CollectorFactory(object):
+    def create_register(self, name):
+        raise NotImplementedError

@@ -18,14 +18,13 @@ import gdb
 
 from cpu import Cpu
 
-class CpuMips(Cpu):
-    _register_list = ['v0', 'v1', 'a0', 'a1', 'a2', 'a3', 't0', 't1', 't2',
-                      't3', 't4', 't5', 't6', 't7', 't8', 't9', 's0', 's1',
-                      's2', 's3', 's4', 's5', 's6', 's7', 's8', 'zero', 'at',
-                      'gp', 'sp', 'kt0', 'kt1']
 
-    def __init__(self):
-        super(CpuMips, self).__init__(self._register_list)
+class CpuMips(Cpu):
+    _register_list = ('v0 v1 a0 a1 a2 a3 t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 s0 s1 '
+                      's2 s3 s4 s5 s6 s7 s8 zero at gp sp kt0 kt1').split()
+
+    def __init__(self, collector_factory):
+        super(CpuMips, self).__init__(collector_factory, self._register_list)
 
     def stack_pointer(self):
         return self.register('sp')

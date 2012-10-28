@@ -17,27 +17,30 @@
 import os
 from sys import stdout
 
+from ui.theme import ThemeManager
+import interface.ui_parameters
+from interface.parameters import ParameterManager
+
 
 class Terminal(object):
     DEFAULT_WIDTH = 80
     DEFAULT_HEIGHT = 25
     DEFAULT_DEPTH = 8
 
-    def __init__(self, theme, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT,
+    def __init__(self, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT,
                  depth=DEFAULT_DEPTH):
-        self._theme = theme(depth)
         self._width = width
         self._height = height
         self._depth = depth
 
     def string_width(self, string, dictionary=None):
-        return self._theme.len(string, dictionary)
+        return self.theme().len(string, dictionary)
 
     def write(self, string, dictionary=None):
         raise NotImplementedError()
 
     def reset(self):
-        self.write(self._theme.property('normal'))
+        self.write(self.theme().property('normal'))
 
     def depth(self):
         return self._depth
@@ -49,15 +52,17 @@ class Terminal(object):
         return self._height
 
     def theme(self):
-        return self._theme
+        parameter_name = interface.ui_parameters.ThemeParameter.name()
+        name = ParameterManager().get_parameter(parameter_name).value
+        return ThemeManager().theme(name)
 
 
 class SysTerminal(Terminal):
-    def __init__(self, theme):
+    def __init__(self):
         width = int(os.popen('tput cols').read().strip())
         height = int(os.popen('tput lines').read().strip())
         depth = int(os.popen('tput colors').read().strip())
-        super(SysTerminal, self).__init__(theme, width, height, depth)
+        super(SysTerminal, self).__init__(width, height, depth)
 
     def write(self, string, dictionary=None):
         stdout.write(self.theme().write(string, dictionary))

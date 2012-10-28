@@ -1,4 +1,4 @@
-# (void)walker command interface
+# (void)walker application interface
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,22 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gdb
 import string
 
-from arch.context import Context
 from base.recipes import grouper
 from ui.widgets import Section
 from ui.widgets import Table
 
-from commands import gdb_register_command
+from interface.commands import DataCommand
+from interface.commands import register_command
+from interface.gdb_collector import GdbCollectorFactory
+from interface.voidwalker import VoidwalkerCommand
 
 
-@gdb_register_command
-class ContextCommand(gdb.Command):
+@register_command
+class ContextCommand(DataCommand):
     _inferior_manager = None
     _terminal = None
 
+    _ascii_filter = ''.join([['.', chr(x)]
+                             [chr(x) in string.printable[:-5]]
+                             for x in xrange(256)])
     _register_fmt = {16: '0x%032lX',
                      8: '0x%016lX',
                      4: '0x%08lX',
@@ -37,15 +41,13 @@ class ContextCommand(gdb.Command):
 
     @staticmethod
     def name():
-        return 'pcontext'
+        return '%s %s' % (VoidwalkerCommand.name(), 'context')
 
-    def __init__(self, inferior_manager, terminal):
-        super(ContextCommand, self).__init__(self.name(),
-                                             gdb.COMMAND_DATA,
-                                             gdb.COMPLETE_NONE)
-
-        self._inferior_manager = inferior_manager
+    def init(self, terminal):
         self._terminal = terminal
+
+    def __init__(self):
+        super(ContextCommand, self).__init__()
 
     def _print_regs(self, context):
         table = Table()
@@ -83,16 +85,16 @@ class ContextCommand(gdb.Command):
             for octuple in grouper(8, line):
                 for quadruple in grouper(4, octuple):
                     hex_string += [(' %02x' % i) for i in quadruple]
-                    ascii_string += ['.' if chr(x) not in string.printable
-                                     else chr(x)
-                                     for x in quadruple]
+                    filtered = ''.join([chr(x).translate(self._ascii_filter)
+                                        for x in quadruple])
+                    ascii_string += filtered
 
                 hex_string += ['  ']
                 ascii_string += ['  ']
 
-            row = Table.Row(('0x%016x:    %s    %s' %
-                             (address, ''.join(hex_string),
-                              ''.join(ascii_string))))
+            contents = ('0x%016x:    %s    %s' % (address, ''.join(hex_string),
+                                                  ''.join(ascii_string)))
+            row = Table.Row(contents)
             address += 16
             table.add_row(row)
 
@@ -121,14 +123,8 @@ class ContextCommand(gdb.Command):
         section.add_component(table)
         section.draw(self._terminal, self._terminal.width())
 
-    def invoke(self, argument, from_tty):
-        inferior_num = gdb.selected_inferior().num
-        inferior = self._inferior_manager().get_inferior(inferior_num)
-        if not inferior:
-            raise gdb.GdbError(('Inferior %d does not exist in manager!' %
-                                inferior_num))
-
-        context = Context(inferior.cpu())
+    def invoke(self, inferior, argument):
+        context = GdbCollectorFactory().create_context(inferior.cpu())
 
         self._print_regs(context)
         self._print_stack(context)

@@ -23,6 +23,10 @@ from ui.zenburn import Zenburn
 
 
 class TestTheme(object):
+    def setUp(self):
+        self._terminal = SysTerminal()
+        ThemeManager().init(self._terminal.depth())
+
     def tearDown(self):
         reset = self.theme().property('normal')
         self.terminal().write('%s\n' % reset)
@@ -31,7 +35,7 @@ class TestTheme(object):
         raise NotImplementedError()
 
     def terminal(self):
-        raise NotImplementedError()
+        return self._terminal
 
     def test_faces(self):
         reset = self.theme().property('normal')
@@ -42,22 +46,10 @@ class TestTheme(object):
 
 
 class TestSolarized(TestTheme, TestCase):
-    _theme = ThemeManager().theme(Solarized.name())
-    _terminal = SysTerminal(_theme)
-
     def theme(self):
-        return self._terminal.theme()
-
-    def terminal(self):
-        return self._terminal
+        return ThemeManager().theme(Solarized.name())
 
 
 class TestZenburn(TestTheme, TestCase):
-    _theme = ThemeManager().theme(Zenburn.name())
-    _terminal = SysTerminal(_theme)
-
     def theme(self):
-        return self._terminal.theme()
-
-    def terminal(self):
-        return self._terminal
+        return ThemeManager().theme(Zenburn.name())

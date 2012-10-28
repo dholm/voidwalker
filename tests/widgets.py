@@ -24,13 +24,13 @@ from ui.widgets import Table
 
 
 class TestWidgets(TestCase):
-    _theme = ThemeManager().theme(Solarized.name())
-    _terminal = SysTerminal(_theme)
-
     def theme(self):
         return self._terminal.theme()
 
     def setUp(self):
+        self._theme = ThemeManager().theme(Solarized.name())
+        self._terminal = SysTerminal()
+
         reset = self.theme().property('normal')
         self._terminal.write('%s\n\t# Begin Widget #\n' % reset)
 
