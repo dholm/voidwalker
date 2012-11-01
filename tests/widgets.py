@@ -16,11 +16,11 @@
 
 from unittest import TestCase
 
-from ui.solarized import Solarized
-from ui.terminal import SysTerminal
-from ui.theme import ThemeManager
-from ui.widgets import Section
-from ui.widgets import Table
+from voidwalker.ui.terminal import SysTerminal
+from voidwalker.ui.theme import ThemeManager
+from voidwalker.ui.themes.solarized import Solarized
+from voidwalker.ui.widgets import Section
+from voidwalker.ui.widgets import Table
 
 
 class TestWidgets(TestCase):

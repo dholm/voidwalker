@@ -20,27 +20,31 @@ import sys
 voidwalker_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 sys.path.append(os.path.dirname(voidwalker_path))
 
-from arch.architecture import ArchitectureFactory
-from interface.context import ContextCommand
-from interface.gdb_collector import GdbCollectorFactory
-from ui.theme import ThemeManager
-import interface
-import interface.gdb_command
-import interface.gdb_parameter
+# Register all commands, parameters, cpus and themes
+from voidwalker.interface.commands import *
+from voidwalker.interface.parameters import *
+from voidwalker.platform.cpus import *
+from voidwalker.ui.themes import *
 
+from voidwalker.gdb.command import GdbCommandFactory
+from voidwalker.gdb.inferior import GdbInferiorFactory
+from voidwalker.gdb.parameter import GdbParameterFactory
+from voidwalker.gdb.platform import GdbPlatformFactory
+from voidwalker.gdb.terminal import GdbTerminal
+from voidwalker.interface.command import CommandManager
+from voidwalker.interface.parameter import ParameterManager
+from voidwalker.types.inferior import InferiorManager
+from voidwalker.ui.theme import ThemeManager
 
-from ui.gdb_terminal import GdbTerminal
 
 version = '0.0.0'
 
-interface.parameters.ParameterManager().init(interface.gdb_parameter.factory)
-ArchitectureFactory().init(GdbCollectorFactory())
-
+ParameterManager().init()
 terminal = GdbTerminal()
 ThemeManager().init(terminal.depth())
+CommandManager().init(GdbCommandFactory(), terminal)
+InferiorManager().init(GdbInferiorFactory())
+
 terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
                 'v%(version)s installed%(face-reset)s\n'),
                {'version': version})
-
-interface.commands.CommandManager().init(interface.gdb_command.factory,
-                                         terminal)

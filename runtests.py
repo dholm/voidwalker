@@ -19,19 +19,24 @@
 import sys
 import unittest
 
-import interface
-import ui
+from voidwalker.interface.parameter import ParameterFactory
+from voidwalker.interface.parameter import ParameterManager
+from voidwalker.ui.terminal import SysTerminal
+from voidwalker.ui.theme import ThemeManager
+from voidwalker.utils.decorators import singleton_implementation
 import tests
 
 
-def parameter_factory(parameter_type):
-    parameter = parameter_type()
-    parameter.value = parameter.default_value()
-    return parameter
+@singleton_implementation(ParameterFactory)
+class TestParameterFactory(object):
+    def create_parameter(self, parameter_type):
+        parameter = parameter_type()
+        parameter.value = parameter.default_value()
+        return parameter
 
-interface.parameters.ParameterManager().init(parameter_factory)
-terminal = ui.terminal.SysTerminal()
-ui.theme.ThemeManager().init(terminal.depth())
+ParameterManager().init()
+terminal = SysTerminal()
+ThemeManager().init(terminal.depth())
 
 suite = tests.suite()
 runner = unittest.TextTestRunner(verbosity=2)

@@ -16,10 +16,9 @@
 
 from unittest import TestCase
 
-from ui.solarized import Solarized
-from ui.terminal import SysTerminal
-from ui.theme import ThemeManager
-from ui.zenburn import Zenburn
+from voidwalker.ui.terminal import SysTerminal
+from voidwalker.ui.theme import ThemeManager
+from voidwalker.ui.themes import *
 
 
 class TestTheme(object):
@@ -47,9 +46,9 @@ class TestTheme(object):
 
 class TestSolarized(TestTheme, TestCase):
     def theme(self):
-        return ThemeManager().theme(Solarized.name())
+        return ThemeManager().theme(solarized.Solarized.name())
 
 
 class TestZenburn(TestTheme, TestCase):
     def theme(self):
-        return ThemeManager().theme(Zenburn.name())
+        return ThemeManager().theme(zenburn.Zenburn.name())
