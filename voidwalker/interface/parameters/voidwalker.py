@@ -1,4 +1,4 @@
-# (void)walker base types
+# (void)walker command interface
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,4 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['cpu', 'inferior']
+from ..parameter import Parameter
+from ..parameter import register_parameter
+
+
+@register_parameter
+class VoidwalkerParameter(Parameter):
+    show_doc = '(void)walker parameters'
+
+    def __init__(self):
+        super(VoidwalkerParameter, self).__init__()
+
+    def init(self):
+        pass
+
+    def default_value(self):
+        return None
+
+    @staticmethod
+    def name():
+        return 'voidwalker'

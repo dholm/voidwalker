@@ -21,19 +21,16 @@ voidwalker_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 sys.path.append(os.path.dirname(voidwalker_path))
 
 # Register all commands, parameters, cpus and themes
+from voidwalker.gdb import *
 from voidwalker.interface.commands import *
 from voidwalker.interface.parameters import *
 from voidwalker.platform.cpus import *
 from voidwalker.ui.themes import *
 
-from voidwalker.gdb.command import GdbCommandFactory
-from voidwalker.gdb.inferior import GdbInferiorFactory
-from voidwalker.gdb.parameter import GdbParameterFactory
-from voidwalker.gdb.platform import GdbPlatformFactory
 from voidwalker.gdb.terminal import GdbTerminal
 from voidwalker.interface.command import CommandManager
 from voidwalker.interface.parameter import ParameterManager
-from voidwalker.types.inferior import InferiorManager
+from voidwalker.target.inferior import InferiorManager
 from voidwalker.ui.theme import ThemeManager
 
 
@@ -42,8 +39,8 @@ version = '0.0.0'
 ParameterManager().init()
 terminal = GdbTerminal()
 ThemeManager().init(terminal.depth())
-CommandManager().init(GdbCommandFactory(), terminal)
-InferiorManager().init(GdbInferiorFactory())
+CommandManager().init(terminal)
+InferiorManager().init()
 
 terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
                 'v%(version)s installed%(face-reset)s\n'),

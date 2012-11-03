@@ -18,10 +18,11 @@ import gdb
 import os.path
 import re
 
-from ..platform.architecture import ArchitectureFactory
-from ..types.cpu import Architecture
-from ..types.inferior import Inferior
-from ..utils.decorators import singleton
+from ..platform.architecture import ArchitectureManager
+from ..platform.cpu import Architecture
+from ..target.inferior import Inferior
+from ..target.inferior import InferiorFactory
+from ..utils.decorators import singleton_implementation
 
 
 class GdbInferior(Inferior):
@@ -30,13 +31,16 @@ class GdbInferior(Inferior):
         self._gdb_inferior = gdb_inferior
 
 
-@singleton
-class GdbInferiorFactory:
+@singleton_implementation(InferiorFactory)
+class GdbInferiorFactory(object):
     _file_expression = re.compile((r'`(?P<path>[^\']+)\', '
                                    r'file type (?P<target>\S+).'))
     _inferior_expression = re.compile((r'(?P<num>\d+)\s+'
                                        r'(?P<description>\S+ \S*)\s+'
                                        r'(?P<path>.+)$'))
+
+    def __init__(self):
+        pass
 
     @staticmethod
     def _target_to_architecture(target):
@@ -70,7 +74,8 @@ class GdbInferiorFactory:
                       if os.path.abspath(i[0]).strip() == inferior_path).next()
 
             architecture = self._target_to_architecture(target)
-            cpu = ArchitectureFactory().create_cpu(architecture)
+            cpu = ArchitectureManager().create_cpu(architecture)
+
         except TypeError:
             pass
 

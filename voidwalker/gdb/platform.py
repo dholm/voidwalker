@@ -18,8 +18,8 @@ import gdb
 
 from ..platform.context import Context
 from ..platform.context import ContextRegister
+from ..platform.cpu import Register
 from ..platform.factory import PlatformFactory
-from ..types.cpu import Register
 from ..utils.decorators import singleton_implementation
 
 
@@ -40,7 +40,7 @@ class GdbPlatformFactory(object):
             def value(self):
                 value = gdb.parse_and_eval('$' + self.name())
                 try:
-                    return long(value)
+                    return abs(long(value))
                 except gdb.error:
                     return None
 

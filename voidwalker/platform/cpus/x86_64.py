@@ -14,18 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ...types.cpu import Architecture
-from ...types.cpu import Cpu
+from ..cpu import Architecture
+from ..cpu import Cpu
 from ..architecture import register_cpu
 
 
 @register_cpu
-class CpuX8664(Cpu):
+class X8664Cpu(Cpu):
     _register_list = ('rax rbx rcx rdx rsi rdi rbp rsp r8 r9 r10 r11 r12 r13 '
                       'r14 r15 rip cs ss ds es fs gs').split()
 
-    def __init__(self, collector_factory):
-        super(CpuX8664, self).__init__(collector_factory, self._register_list)
+    def __init__(self):
+        super(X8664Cpu, self).__init__(self._register_list)
 
     @staticmethod
     def architecture():

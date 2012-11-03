@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..utils.decorators import singleton
+from ..utils.decorators import singleton_specification
 
 
 class Command(object):
@@ -23,9 +24,11 @@ class Command(object):
 
 
 class DataCommand(Command):
-    pass
+    def init(self, terminal):
+        raise NotImplementedError
 
 
+@singleton_specification
 class CommandFactory(object):
     def create_command(self, command_type):
         raise NotImplementedError
@@ -37,10 +40,14 @@ class CommandManager(object):
         self._commands = {}
         self._instances = {}
 
-    def init(self, command_factory, terminal):
+    def init(self, terminal):
         for name, Cmd in self._commands.iteritems():
-            self._instances[name] = command_factory.create_command(Cmd)
+            self._instances[name] = CommandFactory().create_command(Cmd)
             self._instances[name].init(terminal)
+
+    def command(self, name):
+        assert name in self._commands
+        return self._commands[name]
 
     def add_command(self, command):
         self._commands[command.name()] = command

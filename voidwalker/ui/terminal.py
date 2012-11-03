@@ -17,7 +17,6 @@
 import os
 from sys import stdout
 
-from ..interface.parameter import ParameterManager
 from ..interface.parameters.ui import ThemeParameter
 from .theme import ThemeManager
 
@@ -52,8 +51,7 @@ class Terminal(object):
         return self._height
 
     def theme(self):
-        name = ParameterManager().get_parameter(ThemeParameter.name()).value
-        return ThemeManager().theme(name)
+        return ThemeManager().theme(ThemeParameter.get_value())
 
 
 class SysTerminal(Terminal):

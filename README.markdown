@@ -44,6 +44,17 @@ following line to ~/.gdbinit:
 
     set voidwalker-theme zenburn
 
+Controlling what is shown as part of a context:
+
+    voidwalker-show-registers
+    voidwalker-show-stack
+    voidwalker-show-instructions
+
+For instance, to suppress the stack from being dumped when calling *voidwalker
+context* add the following line to ~/.gdbinit:
+
+    set voidwalker-show-stack off
+
 
 ## Themes
 

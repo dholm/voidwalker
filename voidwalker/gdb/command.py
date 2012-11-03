@@ -19,12 +19,12 @@ import gdb
 from ..interface.command import Command
 from ..interface.command import CommandFactory
 from ..interface.command import DataCommand
-from ..types.inferior import InferiorManager
-from ..utils.decorators import singleton
+from ..target.inferior import InferiorManager
+from ..utils.decorators import singleton_implementation
 
 
-@singleton
-class GdbCommandFactory(CommandFactory):
+@singleton_implementation(CommandFactory)
+class GdbCommandFactory(object):
     def create_command(self, command_type):
         if issubclass(command_type, DataCommand):
             class GdbDataCommand(gdb.Command, command_type):

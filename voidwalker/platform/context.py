@@ -18,13 +18,10 @@ import re
 import string
 from collections import OrderedDict
 
-from ..types.cpu import Register
+from .cpu import Register
 
 
 class ContextRegister(Register):
-    _size = None
-    _value = None
-
     def __init__(self, register):
         super(ContextRegister, self).__init__(register.name())
         self._size = register.size()

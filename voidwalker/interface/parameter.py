@@ -20,8 +20,21 @@ from ..utils.decorators import singleton_specification
 
 class Parameter(object):
     def init(self):
+        pass
+
+    @staticmethod
+    def name():
         raise NotImplementedError
 
+    @classmethod
+    def get_value(cls):
+        return ParameterManager().parameter(cls.name()).value
+
+    def default_value(self):
+        raise NotImplementedError
+
+
+class ParameterBoolean(Parameter):
     def default_value(self):
         raise NotImplementedError
 
@@ -51,7 +64,7 @@ class ParameterManager(object):
     def add_parameter(self, parameter):
         self._parameters[parameter.name()] = parameter
 
-    def get_parameter(self, name):
+    def parameter(self, name):
         assert name in self._instances
         return self._instances[name]
 

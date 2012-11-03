@@ -17,6 +17,7 @@
 from ...ui.theme import ThemeManager
 from ..parameter import ParameterEnum
 from ..parameter import register_parameter
+from .voidwalker import VoidwalkerParameter
 
 
 @register_parameter
@@ -40,4 +41,4 @@ class ThemeParameter(ParameterEnum):
 
     @staticmethod
     def name():
-        return '%s' % ('voidwalker-theme')
+        return '%s %s' % (VoidwalkerParameter.name(), 'theme')

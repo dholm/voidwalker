@@ -19,11 +19,45 @@ from unittest import TestCase
 from voidwalker.ui.terminal import SysTerminal
 from voidwalker.ui.theme import ThemeManager
 from voidwalker.ui.themes.solarized import Solarized
+from voidwalker.ui.themes.zenburn import Zenburn
 from voidwalker.ui.widgets import Section
 from voidwalker.ui.widgets import Table
 
 
-class TestWidgets(TestCase):
+class ThemeTest(object):
+    def setUp(self):
+        self._terminal = SysTerminal()
+        ThemeManager().init(self._terminal.depth())
+
+    def tearDown(self):
+        reset = self.theme().property('normal')
+        self.terminal().write('%s\n' % reset)
+
+    def theme(self):
+        raise NotImplementedError()
+
+    def terminal(self):
+        return self._terminal
+
+    def test_faces(self):
+        reset = self.theme().property('normal')
+        self.terminal().write('\n')
+        for name, face in self.theme().faces().iteritems():
+            self.terminal().write(self.theme().write('\t%s[%s]%s\n' %
+                                                     (face, name, reset)))
+
+
+class SolarizedTest(ThemeTest, TestCase):
+    def theme(self):
+        return ThemeManager().theme(Solarized.name())
+
+
+class ZenburnTest(ThemeTest, TestCase):
+    def theme(self):
+        return ThemeManager().theme(Zenburn.name())
+
+
+class WidgetsTest(TestCase):
     def theme(self):
         return self._terminal.theme()
 

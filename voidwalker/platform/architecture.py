@@ -15,11 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..utils.decorators import singleton
-from .factory import PlatformFactory
 
 
 @singleton
-class ArchitectureFactory:
+class ArchitectureManager:
     def __init__(self):
         self._cpu_map = {}
 
@@ -28,9 +27,9 @@ class ArchitectureFactory:
 
     def create_cpu(self, architecture):
         assert architecture in self._cpu_map
-        return self._cpu_map.get(architecture, None)(PlatformFactory())
+        return self._cpu_map.get(architecture, None)()
 
 
 def register_cpu(cls):
-    ArchitectureFactory().add_cpu(cls)
+    ArchitectureManager().add_cpu(cls)
     return cls

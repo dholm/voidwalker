@@ -1,4 +1,4 @@
-# (void)walker base types
+# (void)walker hardware platform support
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,11 @@
 
 from collections import OrderedDict
 
+from .factory import PlatformFactory
+
 
 class Architecture:
+    Test = 0
     X86 = 1
     X86_64 = 2
     MIPS = 3
@@ -39,12 +42,10 @@ class Register(object):
 
 
 class Cpu(object):
-    _registers = None
-
-    def __init__(self, collector_factory, register_list):
+    def __init__(self, register_list):
         self._registers = OrderedDict()
         for name in iter(register_list):
-            self._registers[name] = collector_factory.create_register(name)
+            self._registers[name] = PlatformFactory().create_register(name)
 
     @staticmethod
     def architecture():
@@ -58,4 +59,4 @@ class Cpu(object):
         return self._registers.iteritems()
 
     def stack_pointer(self):
-        return None
+        raise NotImplementedError

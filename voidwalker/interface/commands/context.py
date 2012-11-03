@@ -22,6 +22,9 @@ from ...ui.widgets import Table
 from ...utils.recipes import grouper
 from ..command import DataCommand
 from ..command import register_command
+from ..parameters.show import ShowInstructionsParameter
+from ..parameters.show import ShowRegistersParameter
+from ..parameters.show import ShowStackParameter
 from .voidwalker import VoidwalkerCommand
 
 
@@ -111,10 +114,13 @@ class ContextCommand(DataCommand):
             content = []
             content += [('%s%s' % (face, instruction['address']))]
             if instruction['symbol']:
-                content += [('   %(face-identifier)s' + instruction['symbol'])]
+                content += [('%(face-identifier)s   ' + instruction['symbol'])]
             content += [('   %s%s' % (face, instruction['mnemonic']))]
             if instruction['operands']:
                 content += [('   %s%s' % (face, instruction['operands']))]
+
+            if instruction['meta']:
+                content += '%(face-normal)s'
             row = Table.Row(''.join(content))
             table.add_row(row)
 
@@ -125,9 +131,20 @@ class ContextCommand(DataCommand):
     def invoke(self, inferior, argument):
         context = PlatformFactory().create_context(inferior.cpu())
 
-        self._print_regs(context)
-        self._print_stack(context)
-        self._print_instructions(context)
-        end_section = Section(None)
-        end_section.draw(self._terminal, self._terminal.width())
-        self._terminal.reset()
+        draw_end_section = False
+        if ShowRegistersParameter.get_value():
+            self._print_regs(context)
+            draw_end_section = True
+
+        if ShowStackParameter.get_value():
+            self._print_stack(context)
+            draw_end_section = True
+
+        if ShowInstructionsParameter.get_value():
+            self._print_instructions(context)
+            draw_end_section = True
+
+        if draw_end_section:
+            end_section = Section(None)
+            end_section.draw(self._terminal, self._terminal.width())
+            self._terminal.reset()

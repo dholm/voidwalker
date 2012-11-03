@@ -1,4 +1,4 @@
-# (void)walker base types
+# (void)walker target support
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..utils.decorators import singleton
+from ..utils.decorators import singleton_specification
 
 
 class Inferior(object):
@@ -25,14 +26,19 @@ class Inferior(object):
         return self._cpu
 
 
+@singleton_specification
+class InferiorFactory(object):
+    def create_inferior(self, num):
+        raise NotImplementedError
+
+
 @singleton
 class InferiorManager(object):
-    def init(self, inferior_factory):
-        self._factory = inferior_factory
+    def init(self):
+        pass
 
     def __init__(self):
         self._inferiors = {}
-        self._factory = None
 
     def add_inferior(self, inferior_num, inferior):
         self._inferiors[inferior_num] = inferior
@@ -40,6 +46,6 @@ class InferiorManager(object):
     def inferior(self, inferior_num):
         if inferior_num in self._inferiors:
             return self._inferiors[inferior_num]
-        inferior = self._factory.create_inferior(inferior_num)
+        inferior = InferiorFactory().create_inferior(inferior_num)
         self.add_inferior(inferior_num, inferior)
         return inferior

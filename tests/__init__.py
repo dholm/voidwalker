@@ -16,13 +16,17 @@
 
 import unittest
 
-import tests.theme
-import tests.widgets
+import tests.interface
+import tests.platform
+import tests.target
+import tests.ui
 
 
 def suite():
     loader = unittest.TestLoader()
     test_suite = unittest.TestSuite()
-    test_suite.addTests(loader.loadTestsFromModule(tests.theme))
-    test_suite.addTests(loader.loadTestsFromModule(tests.widgets))
+    test_suite.addTests(loader.loadTestsFromModule(tests.interface))
+    test_suite.addTests(loader.loadTestsFromModule(tests.platform))
+    test_suite.addTests(loader.loadTestsFromModule(tests.target))
+    test_suite.addTests(loader.loadTestsFromModule(tests.ui))
     return test_suite

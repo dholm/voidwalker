@@ -1,4 +1,4 @@
-# (void)walker hardware platform support
+# (void)walker target support
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,4 +14,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['architecture', 'context', 'cpu', 'factory']
+__all__ = ['inferior']

@@ -17,6 +17,7 @@
 import gdb
 
 from ..interface.parameter import Parameter
+from ..interface.parameter import ParameterBoolean
 from ..interface.parameter import ParameterEnum
 from ..interface.parameter import ParameterFactory
 from ..utils.decorators import singleton_implementation
@@ -29,22 +30,34 @@ class GdbParameterFactory(object):
             class GdbParameterEnum(gdb.Parameter, parameter_type):
                 def __init__(self):
                     parameter_type.__init__(self)
+                    gdb_name = parameter_type.name().replace(' ', '-')
                     gdb.Parameter.__init__(self,
-                                           parameter_type.name(),
+                                           gdb_name,
                                            gdb.COMMAND_SUPPORT,
                                            gdb.PARAM_ENUM,
                                            parameter_type.sequence(self))
                     self.value = parameter_type.default_value(self)
+
             return GdbParameterEnum()
 
-        elif issubclass(parameter_type, Parameter):
-            class GdbParameter(gdb.Parameter, parameter_type):
+        elif issubclass(parameter_type, ParameterBoolean):
+            class GdbParameterBoolean(gdb.Parameter, parameter_type):
                 def __init__(self):
-                    parameter_type.__init__()
-                    gdb.Parameter.__init__(parameter_type.name(),
-                                           gdb.COMMAND_NONE,
-                                           gdb.PARAM_STRING)
+                    parameter_type.__init__(self)
+                    gdb_name = parameter_type.name().replace(' ', '-')
+                    gdb.Parameter.__init__(self,
+                                           gdb_name,
+                                           gdb.COMMAND_SUPPORT,
+                                           gdb.PARAM_BOOLEAN)
                     self.value = parameter_type.default_value(self)
+
+            return GdbParameterBoolean()
+
+        elif issubclass(parameter_type, Parameter):
+            class GdbParameter(parameter_type):
+                def __init__(self):
+                    parameter_type.__init__(self)
+
             return GdbParameter()
 
         else:
