@@ -1,4 +1,4 @@
-# (void)walker command interface
+# (void)walker target support
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,21 +14,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..command import Command
-from ..command import register_command
+from collections import deque
 
 
-@register_command
-class VoidwalkerCommand(Command):
-    @staticmethod
-    def name():
-        return 'voidwalker'
+class Thread(object):
+    def __init__(self, inferior_id):
+        self._inferior_id = inferior_id
+        self._contexts = deque()
 
-    def init(self, terminal):
-        self._terminal = terminal
+    def name(self):
+        raise NotImplementedError
 
-    def __init__(self):
-        super(VoidwalkerCommand, self).__init__()
+    def id(self):
+        raise NotImplementedError
 
-    def invoke(self, argument, from_tty):
-        pass
+    def is_valid(self):
+        raise NotImplementedError
+
+    def inferior_id(self):
+        return self._inferior_id
+
+    def contexts(self):
+        return self._contexts

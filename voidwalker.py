@@ -27,6 +27,7 @@ from voidwalker.interface.parameters import *
 from voidwalker.platform.cpus import *
 from voidwalker.ui.themes import *
 
+from voidwalker.gdb.convenience import ConvenienceManager
 from voidwalker.gdb.terminal import GdbTerminal
 from voidwalker.interface.command import CommandManager
 from voidwalker.interface.parameter import ParameterManager
@@ -41,6 +42,7 @@ terminal = GdbTerminal()
 ThemeManager().init(terminal.depth())
 CommandManager().init(terminal)
 InferiorManager().init()
+ConvenienceManager().init()
 
 terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
                 'v%(version)s installed%(face-reset)s\n'),

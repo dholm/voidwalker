@@ -20,6 +20,7 @@ from ..platform.context import Context
 from ..platform.context import ContextRegister
 from ..platform.cpu import Register
 from ..platform.factory import PlatformFactory
+from ..types.data import DataChunk
 from ..utils.decorators import singleton_implementation
 
 
@@ -46,24 +47,17 @@ class GdbPlatformFactory(object):
 
         return GdbRegister(name)
 
-    def create_context(self, cpu):
+    def create_context(self, inferior, thread):
         class GdbContext(Context):
             def _update_registers(self):
-                for name, register in self.cpu().registers():
+                for name, register in inferior.cpu().registers():
                     self._registers[name] = ContextRegister(register)
 
             def _update_stack(self):
-                result = gdb.execute(('x /%dxb $sp' %
-                                      (0x8 * self._STACK_LINES)),
-                                     False, True)
-
-                for line in result.split('\n'):
-                    if not line:
-                        continue
-                    match = Context._data_exp.search(line).groupdict()
-                    address = int(match['address'], 16)
-                    self._stack[address] = [int(i, 16)
-                                            for i in match['data'].split()]
+                size = self._STACK_LINES * 0x8
+                address = abs(long(gdb.parse_and_eval('$sp'))) & ~0xf
+                stack = inferior.gdb_inferior().read_memory(address, size)
+                self._stack = DataChunk(address, stack)
 
             def _update_instructions(self):
                 result = gdb.execute(('x /%di $pc' % self._TOTAL_INSTRUCTIONS),
@@ -74,11 +68,11 @@ class GdbPlatformFactory(object):
                     if instruction:
                         self._instructions.append(instruction.groupdict())
 
-            def __init__(self, cpu):
-                super(GdbContext, self).__init__(cpu)
+            def __init__(self):
+                super(GdbContext, self).__init__()
 
                 self._update_registers()
                 self._update_stack()
                 self._update_instructions()
 
-        return GdbContext(cpu)
+        return GdbContext()

@@ -9,6 +9,8 @@ of GDB commands.
 
 ## Requirements
 
+GDB 7.5 or later built with support for Python extensions.
+
 Currently (void)walker has support for the following architectures, but adding
 new ones should be fairly easy at this point.
 
@@ -19,11 +21,14 @@ new ones should be fairly easy at this point.
 ## Installation
 
 Put (void)walker somewhere on your system and simply add the following line to
-your .gdbinit:
+your *~/.gdbinit*:
 
-    python execfile('<path to voidwalker.py')
+    python execfile('<path to voidwalker.py>')
 
 The next time you start GDB you should see (void)walker being loaded.
+
+You should also install all the (void)walker hooks in order to complete the
+integration with GDB.
 
 
 ## Usage
@@ -33,6 +38,16 @@ Dumping the context of the current stack frame:
     voidwalker context
 
 
+### Hooks
+
+(void)walker commands that are prefixed with *hook-* are intended to be put
+into hooks of the same name in *~/.gdbinit*, for example:
+
+    define hook-stop
+        voidwalker hook-stop
+    end
+
+
 ## Parameters
 
 Changing themes:
@@ -40,7 +55,7 @@ Changing themes:
     voidwalker-theme
 
 For instance, to set Zenburn as the default theme instead of Solarized add the
-following line to ~/.gdbinit:
+following line to *~/.gdbinit*:
 
     set voidwalker-theme zenburn
 

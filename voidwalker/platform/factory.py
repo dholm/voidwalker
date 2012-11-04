@@ -22,5 +22,5 @@ class PlatformFactory(object):
     def create_register(self, name):
         raise NotImplementedError
 
-    def create_context(self, cpu):
+    def create_context(self, inferior, thread):
         raise NotImplementedError

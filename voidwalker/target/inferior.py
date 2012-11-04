@@ -15,21 +15,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..utils.decorators import singleton
-from ..utils.decorators import singleton_specification
+from .factory import TargetFactory
 
 
 class Inferior(object):
     def __init__(self, cpu):
         self._cpu = cpu
+        self._threads = {}
+
+    def id(self):
+        raise NotImplementedError
 
     def cpu(self):
         return self._cpu
 
+    def has_thread(self, thread_id):
+        return thread_id in self._threads
 
-@singleton_specification
-class InferiorFactory(object):
-    def create_inferior(self, num):
-        raise NotImplementedError
+    def add_thread(self, thread):
+        self._threads[thread.id()] = thread
+
+    def thread(self, thread_id):
+        assert self.has_thread(thread_id)
+        return self._threads[thread_id]
 
 
 @singleton
@@ -40,12 +48,12 @@ class InferiorManager(object):
     def __init__(self):
         self._inferiors = {}
 
-    def add_inferior(self, inferior_num, inferior):
-        self._inferiors[inferior_num] = inferior
+    def add_inferior(self, inferior):
+        self._inferiors[inferior.id()] = inferior
 
-    def inferior(self, inferior_num):
-        if inferior_num in self._inferiors:
-            return self._inferiors[inferior_num]
-        inferior = InferiorFactory().create_inferior(inferior_num)
-        self.add_inferior(inferior_num, inferior)
+    def inferior(self, inferior_id):
+        if inferior_id in self._inferiors:
+            return self._inferiors[inferior_id]
+        inferior = TargetFactory().create_inferior(inferior_id)
+        self.add_inferior(inferior)
         return inferior

@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import string
 from collections import OrderedDict
 
 from .cpu import Register
@@ -49,15 +48,10 @@ class Context(object):
                             r'(?P<data>(?:\s*0x[0-9a-f]+)+\s*)'),
                            re.IGNORECASE)
 
-    def __init__(self, cpu):
-        self._cpu = cpu
-
+    def __init__(self):
         self._registers = OrderedDict()
-        self._stack = OrderedDict()
+        self._stack = None
         self._instructions = []
-
-    def cpu(self):
-        return self._cpu
 
     def stack(self):
         return self._stack

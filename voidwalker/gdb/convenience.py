@@ -1,4 +1,4 @@
-# (void)walker command interface
+# (void)walker GDB backend
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,21 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..command import Command
-from ..command import register_command
+import gdb
+
+from ..utils.decorators import singleton
 
 
-@register_command
-class VoidwalkerCommand(Command):
-    @staticmethod
-    def name():
-        return 'voidwalker'
-
-    def init(self, terminal):
-        self._terminal = terminal
-
+@singleton
+class ConvenienceManager(object):
     def __init__(self):
-        super(VoidwalkerCommand, self).__init__()
+        self._functions = {}
 
-    def invoke(self, argument, from_tty):
+    def init(self):
         pass
+
+    def add_function(self, cls):
+        self._functions[cls] = cls()
+
+
+def register_convenience_function(cls):
+    ConvenienceManager().add_function(cls)

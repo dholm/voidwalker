@@ -44,7 +44,7 @@ class Section(Widget):
         self._components.append(component)
 
     def draw(self, terminal, width):
-        width = (width / 5) * 4
+        width -= (width / 20)
         self._draw_header(terminal, width)
 
         for component in self._components:
@@ -52,29 +52,46 @@ class Section(Widget):
 
 
 class Table(Widget):
-    _cells = None
-    _rows = None
-
     class Cell(Widget):
-        _contents = None
-
-        def __init__(self, contents):
+        def __init__(self, contents=''):
+            super(Table.Cell, self).__init__()
+            self._contents = ''
             if contents:
-                self._contents = (' %s ' % contents.strip())
-            else:
-                self._contents = ''
+                self._contents = (' %s ' % contents)
 
         def width(self, terminal):
             return terminal.string_width(self._contents)
 
         def draw(self, terminal, width):
             assert self.width(terminal) <= width
+            padding = ' ' * (width - self.width(terminal))
             terminal.write(('%(contents)s%(padding)s' %
                             {'contents': self._contents,
-                             'padding': ' ' * (width - self.width(terminal))}))
+                             'padding': padding}))
 
-    class Row(Cell):
-        pass
+    class Row(Widget):
+        def __init__(self):
+            super(Table.Row, self).__init__()
+            self._cells = []
+
+        def cells(self):
+            return self._cells
+
+        def add_cell(self, cell):
+            self._cells.append(cell)
+
+        def width(self, terminal):
+            width = 0
+            for cell in self._cells:
+                width += cell.width(terminal)
+            return width
+
+        def draw(self, terminal, cell_widths):
+            assert len(cell_widths) == len(self._cells)
+            assert self.width(terminal) <= sum(cell_widths)
+
+            for i in range(len(self._cells)):
+                self._cells[i].draw(terminal, cell_widths[i])
 
     def _max_cell_width(self, terminal):
         max_width = 0
@@ -83,13 +100,15 @@ class Table(Widget):
         return max_width
 
     def __init__(self):
-        self._cells = []
         self._rows = []
+        self._cells = []
 
     def add_cell(self, cell):
+        assert isinstance(cell, Table.Cell)
         self._cells.append(cell)
 
     def add_row(self, row):
+        assert isinstance(row, Table.Row)
         self._rows.append(row)
 
     def _draw_cells(self, terminal, width):
@@ -117,9 +136,20 @@ class Table(Widget):
         terminal.write('%s\n' % (' ' * last_row_padding))
 
     def _draw_rows(self, terminal, width):
+        cell_widths = []
         for row in self._rows:
-            row.draw(terminal, width)
-            terminal.write('\n')
+            cells = len(row.cells())
+            cell_widths.extend([0] * (cells - len(cell_widths)))
+
+            for i in range(len(row.cells())):
+                cell_widths[i] = max(cell_widths[i],
+                                     row.cells()[i].width(terminal))
+
+        row_width = sum(cell_widths)
+        for row in self._rows:
+            row.draw(terminal, cell_widths)
+            padding = ' ' * (width - row_width)
+            terminal.write('%s\n' % padding)
 
     def draw(self, terminal, width):
         if self._rows:

@@ -1,4 +1,4 @@
-# (void)walker command interface
+# (void)walker basic types
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,21 +14,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..command import Command
-from ..command import register_command
-
-
-@register_command
-class VoidwalkerCommand(Command):
-    @staticmethod
-    def name():
-        return 'voidwalker'
-
-    def init(self, terminal):
-        self._terminal = terminal
-
-    def __init__(self):
-        super(VoidwalkerCommand, self).__init__()
-
-    def invoke(self, argument, from_tty):
-        pass
+__all__ = ['data']

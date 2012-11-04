@@ -27,6 +27,9 @@ class DataCommand(Command):
     def init(self, terminal):
         raise NotImplementedError
 
+    def invoke(self, thread, argument, from_tty=False):
+        raise NotImplementedError
+
 
 @singleton_specification
 class CommandFactory(object):
@@ -44,6 +47,9 @@ class CommandManager(object):
         for name, Cmd in self._commands.iteritems():
             self._instances[name] = CommandFactory().create_command(Cmd)
             self._instances[name].init(terminal)
+
+    def commands(self):
+        return self._commands.iteritems()
 
     def command(self, name):
         assert name in self._commands

@@ -19,8 +19,27 @@ import gdb
 from ..interface.command import Command
 from ..interface.command import CommandFactory
 from ..interface.command import DataCommand
+from ..target.factory import TargetFactory
 from ..target.inferior import InferiorManager
 from ..utils.decorators import singleton_implementation
+
+
+def get_current_thread():
+    inferior_num = gdb.selected_inferior().num
+    inferior = InferiorManager().inferior(inferior_num)
+    if not inferior:
+        raise gdb.GdbError(('Inferior %d does not exist!' %
+                            inferior_num))
+
+    if gdb.selected_thread() is not None:
+        thread_num = gdb.selected_thread().num
+        if not inferior.has_thread(thread_num):
+            TargetFactory().create_thread(inferior, thread_num)
+
+        if inferior.has_thread(thread_num):
+            return inferior.thread(thread_num)
+
+    return None
 
 
 @singleton_implementation(CommandFactory)
@@ -34,13 +53,9 @@ class GdbCommandFactory(object):
                                          gdb.COMMAND_DATA, gdb.COMPLETE_NONE)
 
                 def invoke(self, argument, from_tty):
-                    inferior_num = gdb.selected_inferior().num
-                    inferior = InferiorManager().inferior(inferior_num)
-                    if not inferior:
-                        raise gdb.GdbError(('Inferior %d does not exist!' %
-                                            inferior_num))
-
-                    command_type.invoke(self, inferior, argument)
+                    thread = get_current_thread()
+                    if thread is not None:
+                        command_type.invoke(self, thread, argument, from_tty)
 
             return GdbDataCommand()
 

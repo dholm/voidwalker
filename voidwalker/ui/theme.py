@@ -24,15 +24,10 @@ class Theme(object):
                                           r'(;(\d+|"[^"]*"))*)?'
                                           r'[A-Za-z]'))
 
-    _colors_fmt = {8: '\x1b[%d;3%1d;4%1dm',
-                   16: '\x1b[%d;38;5;%d;48;5;%dm',
-                   256: '\x1b[%d;38;5;%d;48;5;%dm'}
-    _property_fmt = '\x1b[%dm'
-
-    _properties = {'normal': 0,
-                   'bold': 1,
-                   'italic': 2,
-                   'underline': 4}
+    """Controls
+    clear-screen - Clear the screen and reset the cursor
+    """
+    _controls = {'clear-screen': '\x1b[2J'}
 
     """Properties
     normal     - normal face
@@ -40,6 +35,15 @@ class Theme(object):
     italic
     underline
     """
+    _property_fmt = '\x1b[%dm'
+    _properties = {'normal': 0,
+                   'bold': 1,
+                   'italic': 2,
+                   'underline': 4}
+
+    _colors_fmt = {8: '\x1b[%d;3%1d;4%1dm',
+                   16: '\x1b[%d;38;5;%d;48;5;%dm',
+                   256: '\x1b[%d;38;5;%d;48;5;%dm'}
 
     """Faces
     face-normal
@@ -77,6 +81,10 @@ class Theme(object):
         self._add_face('normal', default_color)
         self._faces['face-reset'] = self.property('normal')
 
+    def control(self, name):
+        assert name in self._controls
+        return self._controls[name]
+
     def property(self, name):
         assert name in self._properties
         return (self._property_fmt % self._properties[name])
@@ -89,7 +97,12 @@ class Theme(object):
         return self._faces.get('face-%s' % name, self._faces['face-normal'])
 
     def _filter_string(self, string):
+        if not len(string):
+            return string
+
         string = string.expandtabs()
+        if string[-1] == '\n':
+            string = string[:-1] + ('%s\n' % self.property('normal'))
         return string
 
     def len(self, string, format_dictionary=None):

@@ -93,7 +93,11 @@ class WidgetsTest(TestCase):
     def test_tables_rows(self):
         table = Table()
         for i in range(0, 5):
-            row = Table.Row('row %d' % i)
+            row = Table.Row()
+            for j in range(0, 5):
+                cell = Table.Cell('cell %d,%d' % (i, j))
+                row.add_cell(cell)
+
             table.add_row(row)
 
         table.draw(self._terminal, self._terminal.width() / 2)
@@ -101,7 +105,11 @@ class WidgetsTest(TestCase):
     def test_table_cells_rows(self):
         table = Table()
         for i in range(0, 5):
-            row = Table.Row('row %d' % i)
+            row = Table.Row()
+            for j in range(0, 5):
+                cell = Table.Cell('cell %d,%d' % (i, j))
+                row.add_cell(cell)
+
             table.add_row(row)
             cell = Table.Cell('cell %d' % i)
             table.add_cell(cell)

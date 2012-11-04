@@ -26,6 +26,8 @@ from voidwalker.platform.cpu import Register
 from voidwalker.platform.cpus.mips import MipsCpu
 from voidwalker.platform.cpus.x86_64 import X8664Cpu
 from voidwalker.platform.factory import PlatformFactory
+from voidwalker.target.inferior import InferiorManager
+from voidwalker.target.inferior import TargetFactory
 from voidwalker.utils.decorators import singleton_implementation
 
 
@@ -69,15 +71,15 @@ class PlatformFactoryTest(object):
         self._registers[name] = TestRegister(name)
         return self._registers[name]
 
-    def create_context(self, cpu):
+    def create_context(self, inferior, thread):
         class TestContext(Context):
-            def __init__(self, cpu):
-                super(TestContext, self).__init__(cpu)
+            def __init__(self):
+                super(TestContext, self).__init__()
 
-                for name, register in self.cpu().registers():
+                for name, register in inferior.cpu().registers():
                     self._registers[name] = ContextRegister(register)
 
-        return TestContext(cpu)
+        return TestContext()
 
 
 class CpuTest(TestCase):
@@ -101,11 +103,16 @@ class CpuTest(TestCase):
 
 
 class ContextTest(TestCase):
+    def setUp(self):
+        TargetFactory().create_inferior(0)
+        inferior = InferiorManager().inferior(0)
+        TargetFactory().create_thread(inferior, 0)
+
     def test_registers(self):
-        cpu = ArchitectureManager().create_cpu(TestCpu.architecture())
-        context = PlatformFactory().create_context(cpu)
-        self.assertEqual(cpu, context.cpu())
-        for name, register in cpu.registers():
+        inferior = InferiorManager().inferior(0)
+        thread = inferior.thread(0)
+        context = PlatformFactory().create_context(inferior, thread)
+        for name, register in inferior.cpu().registers():
             self.assertIsNotNone(context.register(name))
             context_register = context.register(name)
             self.assertEqual(register.size(), context_register.size())

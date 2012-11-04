@@ -14,4 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['inferior', 'terminal', 'parameter', 'command', 'platform']
+__all__ = ['target',
+           'terminal',
+           'parameter',
+           'command',
+           'platform',
+           'convenience',
+           'hooks']

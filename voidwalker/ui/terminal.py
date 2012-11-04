@@ -38,6 +38,9 @@ class Terminal(object):
     def write(self, string, dictionary=None):
         raise NotImplementedError()
 
+    def clear(self):
+        self.write(self.theme().control('clear-screen'))
+
     def reset(self):
         self.write(self.theme().property('normal'))
 

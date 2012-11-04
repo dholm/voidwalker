@@ -17,9 +17,11 @@
 import string
 
 from ...platform.factory import PlatformFactory
+from ...target.inferior import InferiorManager
+from ...types.data import DataWidget
 from ...ui.widgets import Section
 from ...ui.widgets import Table
-from ...utils.recipes import grouper
+from ...ui.widgets import Widget
 from ..command import DataCommand
 from ..command import register_command
 from ..parameters.show import ShowInstructionsParameter
@@ -28,30 +30,18 @@ from ..parameters.show import ShowStackParameter
 from .voidwalker import VoidwalkerCommand
 
 
-@register_command
-class ContextCommand(DataCommand):
-    _inferior_manager = None
-    _terminal = None
-
-    _ascii_filter = ''.join([['.', chr(x)]
-                             [chr(x) in string.printable[:-5]]
-                             for x in xrange(256)])
+class ContextWidget(Widget):
     _register_fmt = {16: '0x%032lX',
                      8: '0x%016lX',
                      4: '0x%08lX',
                      2: '0x%04lX'}
 
-    @staticmethod
-    def name():
-        return '%s %s' % (VoidwalkerCommand.name(), 'context')
+    def __init__(self, previous_context, context):
+        super(ContextWidget, self).__init__()
+        self._previous_context = previous_context
+        self._context = context
 
-    def init(self, terminal):
-        self._terminal = terminal
-
-    def __init__(self):
-        super(ContextCommand, self).__init__()
-
-    def _print_regs(self, context):
+    def _create_registers_section(self, previous_context, context):
         table = Table()
         reg_size = 0
         for name, register in context.registers():
@@ -63,9 +53,13 @@ class ContextCommand(DataCommand):
 
             size = register.size()
             value = register.value()
-            if value:
-                contents += [('%(face-constant)s' +
-                              (self._register_fmt[size] % value))]
+            face = '%(face-constant)s'
+            if previous_context.register(name).value() != value:
+                face = '%(face-special)s'
+
+            if value is not None:
+                contents += [('%s%s' % (face,
+                                        (self._register_fmt[size] % value)))]
             else:
                 contents += [('%(face-comment)s' +
                               ' %(dashes)s ' % {'dashes': '-' * size * 2})]
@@ -73,78 +67,96 @@ class ContextCommand(DataCommand):
             cell = Table.Cell(''.join(contents))
             table.add_cell(cell)
 
-        section = Section('regs')
+        section = Section('registers')
         section.add_component(table)
-        section.draw(self._terminal, self._terminal.width())
+        return section
 
-    def _print_stack(self, context):
-        table = Table()
-
-        address = context.stack().keys()[0]
-        for address, line in context.stack().iteritems():
-            hex_string = []
-            ascii_string = []
-            for octuple in grouper(8, line):
-                for quadruple in grouper(4, octuple):
-                    hex_string += [(' %02x' % i) for i in quadruple]
-                    filtered = ''.join([chr(x).translate(self._ascii_filter)
-                                        for x in quadruple])
-                    ascii_string += filtered
-
-                hex_string += ['  ']
-                ascii_string += ['  ']
-
-            contents = ('0x%016x:    %s    %s' % (address, ''.join(hex_string),
-                                                  ''.join(ascii_string)))
-            row = Table.Row(contents)
-            address += 16
-            table.add_row(row)
-
+    def _create_stack_section(self, context):
         section = Section('stack')
-        section.add_component(table)
-        section.draw(self._terminal, self._terminal.width())
+        section.add_component(DataWidget(context.stack()))
+        return section
 
-    def _print_instructions(self, context):
+    def _create_instructions_section(self, context):
         table = Table()
         for instruction in context.instructions():
+            row = Table.Row()
+
             face = '%(face-normal)s'
             if instruction['meta']:
                 face = '%(face-underlined)s'
 
-            content = []
-            content += [('%s%s' % (face, instruction['address']))]
-            if instruction['symbol']:
-                content += [('%(face-identifier)s   ' + instruction['symbol'])]
-            content += [('   %s%s' % (face, instruction['mnemonic']))]
-            if instruction['operands']:
-                content += [('   %s%s' % (face, instruction['operands']))]
+            row.add_cell(Table.Cell('%s%s' % (face, instruction['address'])))
 
-            if instruction['meta']:
-                content += '%(face-normal)s'
-            row = Table.Row(''.join(content))
+            if instruction['symbol']:
+                row.add_cell(Table.Cell('%(face-identifier)s' +
+                                        instruction['symbol']))
+            else:
+                row.add_cell(Table.Cell())
+
+            row.add_cell(Table.Cell('%s%s' %
+                                    (face, instruction['mnemonic'])))
+
+            if instruction['operands']:
+                row.add_cell(Table.Cell('%s%s' %
+                                        (face, instruction['operands'])))
+            else:
+                row.add_cell(Table.Cell())
+
             table.add_row(row)
 
         section = Section('code')
         section.add_component(table)
-        section.draw(self._terminal, self._terminal.width())
+        return section
 
-    def invoke(self, inferior, argument):
-        context = PlatformFactory().create_context(inferior.cpu())
-
-        draw_end_section = False
+    def draw(self, terminal, width):
+        section = Section('context')
+        draw_section = False
         if ShowRegistersParameter.get_value():
-            self._print_regs(context)
-            draw_end_section = True
+            regs = self._create_registers_section(self._previous_context,
+                                                  self._context)
+            section.add_component(regs)
+            draw_section = True
 
         if ShowStackParameter.get_value():
-            self._print_stack(context)
-            draw_end_section = True
+            stack = self._create_stack_section(self._context)
+            section.add_component(stack)
+            draw_section = True
 
         if ShowInstructionsParameter.get_value():
-            self._print_instructions(context)
-            draw_end_section = True
+            instructions = self._create_instructions_section(self._context)
+            section.add_component(instructions)
+            draw_section = True
 
-        if draw_end_section:
-            end_section = Section(None)
-            end_section.draw(self._terminal, self._terminal.width())
-            self._terminal.reset()
+        if draw_section:
+            section.draw(terminal, width)
+            terminal.reset()
+
+
+@register_command
+class ContextCommand(DataCommand):
+    @staticmethod
+    def name():
+        return '%s %s' % (VoidwalkerCommand.name(), 'context')
+
+    def init(self, terminal):
+        self._terminal = terminal
+
+    def __init__(self):
+        super(ContextCommand, self).__init__()
+        self._terminal = None
+
+    def invoke(self, thread, argument, from_tty=False):
+        if not thread.is_valid():
+            return
+
+        inferior = InferiorManager().inferior(thread.inferior_id())
+        context = PlatformFactory().create_context(inferior, thread)
+        previous_context = context
+        if len(thread.contexts()):
+            previous_context = thread.contexts()[-1]
+
+        if not from_tty:
+            thread.contexts().append(context)
+
+        context_widget = ContextWidget(previous_context, context)
+        context_widget.draw(self._terminal, self._terminal.width())
