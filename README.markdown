@@ -37,6 +37,10 @@ Dumping the context of the current stack frame:
 
     voidwalker context
 
+Dumping data by specifying address and length:
+
+    voidwalker dump <address> <length>
+
 
 ### Hooks
 

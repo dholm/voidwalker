@@ -56,7 +56,7 @@ class GdbPlatformFactory(object):
             def _update_stack(self):
                 size = self._STACK_LINES * 0x8
                 address = abs(long(gdb.parse_and_eval('$sp'))) & ~0xf
-                stack = inferior.gdb_inferior().read_memory(address, size)
+                stack = inferior.read_memory(address, size)
                 self._stack = DataChunk(address, stack)
 
             def _update_instructions(self):

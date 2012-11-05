@@ -14,12 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..command import Command
+from ..command import PrefixCommand
 from ..command import register_command
 
 
 @register_command
-class VoidwalkerCommand(Command):
+class VoidwalkerCommand(PrefixCommand):
+    '''(void)walker is a GDB toolbox for low-level software debugging.
+
+https://github.com/dholm/voidwalker'''
+
     @staticmethod
     def name():
         return 'voidwalker'

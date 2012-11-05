@@ -24,6 +24,16 @@ from ..interface.commands.voidwalker import VoidwalkerCommand
 
 @register_command
 class VoidwalkerHookStop(Command):
+    '''This command should be called from GDB hook-stop.
+
+To support all features of (void)walker this command must be called from GDB's
+hook-stop command. If you haven't defined hook-stop simply add the following
+to your ~/.gdbinit:
+
+    define hook-stop
+        voidwalker hook-stop
+    end'''
+
     def __init__(self):
         super(VoidwalkerHookStop, self).__init__()
         self._terminal = None

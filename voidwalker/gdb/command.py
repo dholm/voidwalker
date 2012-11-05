@@ -19,6 +19,7 @@ import gdb
 from ..interface.command import Command
 from ..interface.command import CommandFactory
 from ..interface.command import DataCommand
+from ..interface.command import PrefixCommand
 from ..target.factory import TargetFactory
 from ..target.inferior import InferiorManager
 from ..utils.decorators import singleton_implementation
@@ -42,11 +43,25 @@ def get_current_thread():
     return None
 
 
+def parse_argument_list(argument):
+    args = []
+    for obj in gdb.string_to_argv(argument):
+        try:
+            obj = gdb.parse_and_eval('%s' % obj)
+        except gdb.error:
+            pass
+
+        args.append(obj)
+    return args
+
+
 @singleton_implementation(CommandFactory)
 class GdbCommandFactory(object):
     def create_command(self, command_type):
         if issubclass(command_type, DataCommand):
             class GdbDataCommand(gdb.Command, command_type):
+                __doc__ = command_type.__doc__
+
                 def __init__(self):
                     command_type.__init__(self)
                     gdb.Command.__init__(self, command_type.name(),
@@ -55,17 +70,32 @@ class GdbCommandFactory(object):
                 def invoke(self, argument, from_tty):
                     thread = get_current_thread()
                     if thread is not None:
-                        command_type.invoke(self, thread, argument, from_tty)
+                        args = parse_argument_list(argument)
+                        command_type.invoke(self, thread, args, from_tty)
 
             return GdbDataCommand()
 
-        if issubclass(command_type, Command):
-            class GdbCommand(gdb.Command, command_type):
+        if issubclass(command_type, PrefixCommand):
+            class GdbPrefixCommand(gdb.Command, command_type):
+                __doc__ = command_type.__doc__
+
                 def __init__(self):
                     command_type.__init__(self)
                     gdb.Command.__init__(self, command_type.name(),
                                          gdb.COMMAND_USER,
                                          gdb.COMPLETE_COMMAND, True)
+
+            return GdbPrefixCommand()
+
+        if issubclass(command_type, Command):
+            class GdbCommand(gdb.Command, command_type):
+                __doc__ = command_type.__doc__
+
+                def __init__(self):
+                    command_type.__init__(self)
+                    gdb.Command.__init__(self, command_type.name(),
+                                         gdb.COMMAND_USER,
+                                         gdb.COMPLETE_COMMAND)
 
             return GdbCommand()
 

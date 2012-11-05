@@ -23,6 +23,11 @@ class Command(object):
         raise NotImplementedError
 
 
+class PrefixCommand(Command):
+    def init(self, terminal):
+        raise NotImplementedError
+
+
 class DataCommand(Command):
     def init(self, terminal):
         raise NotImplementedError

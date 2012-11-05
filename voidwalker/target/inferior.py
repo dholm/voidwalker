@@ -39,6 +39,9 @@ class Inferior(object):
         assert self.has_thread(thread_id)
         return self._threads[thread_id]
 
+    def read_memory(self, address, length):
+        raise NotImplementedError
+
 
 @singleton
 class InferiorManager(object):

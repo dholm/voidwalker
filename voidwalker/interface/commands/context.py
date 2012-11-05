@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import string
-
 from ...platform.factory import PlatformFactory
 from ...target.inferior import InferiorManager
 from ...types.data import DataWidget
@@ -134,6 +132,12 @@ class ContextWidget(Widget):
 
 @register_command
 class ContextCommand(DataCommand):
+    '''Show the current context.
+
+If the current thread of the inferior is valid the context will be recorded and
+dumped. The contents of the context can be controlled using the (void)walker
+parameters'''
+
     @staticmethod
     def name():
         return '%s %s' % (VoidwalkerCommand.name(), 'context')
