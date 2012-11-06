@@ -20,7 +20,7 @@ from ..parameter import register_parameter
 
 @register_parameter
 class VoidwalkerParameter(Parameter):
-    show_doc = '(void)walker parameters'
+    '''(void)walker parameters'''
 
     def __init__(self):
         super(VoidwalkerParameter, self).__init__()

@@ -22,9 +22,13 @@ from .voidwalker import VoidwalkerParameter
 
 @register_parameter
 class ThemeParameter(ParameterEnum):
+    '''(void)walker theme
+
+The theme to use for the (void)walker flow UI.'''
+
     DEFAULT_VALUE = 'solarized'
 
-    show_doc = 'Voidwalker\'s theme is currently set to'
+    show_doc = '(void)walker\'s theme is currently set to'
 
     def __init__(self):
         self._themes = [x for x in ThemeManager().themes()]

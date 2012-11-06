@@ -22,52 +22,48 @@ from ...ui.widgets import Table
 from ...ui.widgets import Widget
 from ..command import DataCommand
 from ..command import register_command
-from ..parameters.show import ShowInstructionsParameter
-from ..parameters.show import ShowRegistersParameter
-from ..parameters.show import ShowStackParameter
 from .voidwalker import VoidwalkerCommand
 
 
 class ContextWidget(Widget):
-    _register_fmt = {16: '0x%032lX',
-                     8: '0x%016lX',
-                     4: '0x%08lX',
-                     2: '0x%04lX'}
-
     def __init__(self, previous_context, context):
         super(ContextWidget, self).__init__()
         self._previous_context = previous_context
         self._context = context
 
     def _create_registers_section(self, previous_context, context):
-        table = Table()
-        reg_size = 0
-        for name, register in context.registers():
-            reg_size = max(reg_size, len(name))
+        registers_section = Section('registers')
+        for group, register_dict in context.registers():
+            reg_size = 0
+            for name in register_dict.iterkeys():
+                reg_size = max(reg_size, len(name))
 
-        for name, register in context.registers():
-            contents = [('%(face-identifier)s' +
-                         (('%%-%ds: ' % reg_size) % name))]
+            table = Table()
+            for name, register in register_dict.iteritems():
+                contents = [('%(face-identifier)s' +
+                             (('%%-%ds: ' % reg_size) % name))]
 
-            size = register.size()
-            value = register.value()
-            face = '%(face-constant)s'
-            if previous_context.register(name).value() != value:
-                face = '%(face-special)s'
+                value = register.value()
+                face = '%(face-constant)s'
+                if previous_context.register(register.name()).value() != value:
+                    face = '%(face-special)s'
 
-            if value is not None:
-                contents += [('%s%s' % (face,
-                                        (self._register_fmt[size] % value)))]
-            else:
-                contents += [('%(face-comment)s' +
-                              ' %(dashes)s ' % {'dashes': '-' * size * 2})]
+                if value is not None:
+                    contents += [('%s%s' % (face, register.str()))]
 
-            cell = Table.Cell(''.join(contents))
-            table.add_cell(cell)
+                else:
+                    contents += [('%(face-comment)s' +
+                                  (' %(register)s ' %
+                                   {'register': register.str()}))]
 
-        section = Section('registers')
-        section.add_component(table)
-        return section
+                cell = Table.Cell(''.join(contents))
+                table.add_cell(cell)
+
+            section = Section(group)
+            section.add_component(table)
+            registers_section.add_component(section)
+
+        return registers_section
 
     def _create_stack_section(self, context):
         section = Section('stack')
@@ -76,27 +72,33 @@ class ContextWidget(Widget):
 
     def _create_instructions_section(self, context):
         table = Table()
-        for instruction in context.instructions():
+        instruction_pointer = context.instruction_pointer().value()
+        for address, instruction in context.instructions():
             row = Table.Row()
 
-            face = '%(face-normal)s'
-            if instruction['meta']:
-                face = '%(face-underlined)s'
+            const_face = '%(face-normal)s'
+            if address == instruction_pointer:
+                const_face = '%(face-underlined)s'
+            row.add_cell(Table.Cell('%s0x%016lX:' % (const_face, address)))
 
-            row.add_cell(Table.Cell('%s%s' % (face, instruction['address'])))
-
-            if instruction['symbol']:
+            if instruction.symbol() is not None:
                 row.add_cell(Table.Cell('%(face-identifier)s' +
-                                        instruction['symbol']))
+                                        instruction.symbol()))
             else:
                 row.add_cell(Table.Cell())
 
-            row.add_cell(Table.Cell('%s%s' %
-                                    (face, instruction['mnemonic'])))
+            hex_string = [('%02X' % ord(i))
+                          for i in instruction.data()
+                          if i is not None]
+            row.add_cell(Table.Cell('%s%s' % (const_face,
+                                              ' '.join(hex_string))))
 
-            if instruction['operands']:
-                row.add_cell(Table.Cell('%s%s' %
-                                        (face, instruction['operands'])))
+            row.add_cell(Table.Cell('%s%s' % ('%(face-statement)s',
+                                              instruction.mnemonic())))
+
+            if instruction.operands() is not None:
+                row.add_cell(Table.Cell('%s%s' % ('%(face-statement)s',
+                                                  instruction.operands())))
             else:
                 row.add_cell(Table.Cell())
 
@@ -108,26 +110,20 @@ class ContextWidget(Widget):
 
     def draw(self, terminal, width):
         section = Section('context')
-        draw_section = False
-        if ShowRegistersParameter.get_value():
-            regs = self._create_registers_section(self._previous_context,
-                                                  self._context)
-            section.add_component(regs)
-            draw_section = True
+        regs = self._create_registers_section(self._previous_context,
+                                              self._context)
+        section.add_component(regs)
 
-        if ShowStackParameter.get_value():
+        if self._context.stack() is not None and len(self._context.stack()):
             stack = self._create_stack_section(self._context)
             section.add_component(stack)
-            draw_section = True
 
-        if ShowInstructionsParameter.get_value():
+        if self._context.instructions() is not None:
             instructions = self._create_instructions_section(self._context)
             section.add_component(instructions)
-            draw_section = True
 
-        if draw_section:
-            section.draw(terminal, width)
-            terminal.reset()
+        section.draw(terminal, width)
+        terminal.reset()
 
 
 @register_command

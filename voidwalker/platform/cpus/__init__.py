@@ -14,4 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['mips', 'x86_64']
+__all__ = ['mips',
+           'x86',
+           'x86_64']

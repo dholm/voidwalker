@@ -42,9 +42,6 @@ data widget which displays it in hexadecimal and ascii form (when possible).'''
         self._terminal = None
 
     def invoke(self, thread, arguments, from_tty=False):
-        if not thread.is_valid():
-            return
-
         if len(arguments) != 2:
             self._terminal.write(('%(face-error)sError:'
                                   '%(face-normal)s invalid arguments!\n'))

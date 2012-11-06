@@ -20,6 +20,7 @@ from ..interface.parameter import Parameter
 from ..interface.parameter import ParameterBoolean
 from ..interface.parameter import ParameterEnum
 from ..interface.parameter import ParameterFactory
+from ..interface.parameter import ParameterInteger
 from ..utils.decorators import singleton_implementation
 
 
@@ -31,23 +32,30 @@ class GdbParameterFactory(object):
                 def __init__(self):
                     parameter_type.__init__(self)
                     gdb_name = parameter_type.name().replace(' ', '-')
-                    gdb.Parameter.__init__(self,
-                                           gdb_name,
-                                           gdb.COMMAND_SUPPORT,
+                    gdb.Parameter.__init__(self, gdb_name, gdb.COMMAND_SUPPORT,
                                            gdb.PARAM_ENUM,
                                            parameter_type.sequence(self))
                     self.value = parameter_type.default_value(self)
 
             return GdbParameterEnum()
 
+        elif issubclass(parameter_type, ParameterInteger):
+            class GdbParameterInteger(gdb.Parameter, parameter_type):
+                def __init__(self):
+                    parameter_type.__init__(self)
+                    gdb_name = parameter_type.name().replace(' ', '-')
+                    gdb.Parameter.__init__(self, gdb_name, gdb.COMMAND_SUPPORT,
+                                           gdb.PARAM_ZINTEGER)
+                    self.value = parameter_type.default_value(self)
+
+            return GdbParameterInteger()
+
         elif issubclass(parameter_type, ParameterBoolean):
             class GdbParameterBoolean(gdb.Parameter, parameter_type):
                 def __init__(self):
                     parameter_type.__init__(self)
                     gdb_name = parameter_type.name().replace(' ', '-')
-                    gdb.Parameter.__init__(self,
-                                           gdb_name,
-                                           gdb.COMMAND_SUPPORT,
+                    gdb.Parameter.__init__(self, gdb_name, gdb.COMMAND_SUPPORT,
                                            gdb.PARAM_BOOLEAN)
                     self.value = parameter_type.default_value(self)
 

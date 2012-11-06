@@ -20,30 +20,58 @@ from ..architecture import register_cpu
 from ..cpu import Architecture
 from ..cpu import Cpu
 from ..cpu import Register
-from .x86 import EflagsRegister
+
+
+class EflagsRegister(Register):
+    _flags = OrderedDict([('c', (1 << 0)), ('p', (1 << 2)), ('a', (1 << 4)),
+                          ('z', (1 << 6)), ('s', (1 << 7)), ('t', (1 << 8)),
+                          ('i', (1 << 9)), ('d', (1 << 10)), ('o', (1 << 11)),
+
+                          ('nt', (1 << 14)), ('r', (1 << 16)),
+                          ('vm', (1 << 17)), ('ac', (1 << 18)),
+                          ('vi', (1 << 19)), ('vip', (1 << 20)),
+                          ('id', (1 << 21))])
+
+    def __init__(self, name):
+        super(EflagsRegister, self).__init__(name)
+
+    def size(self):
+        raise NotImplementedError
+
+    def value(self):
+        raise NotImplementedError
+
+    def str(self):
+        value = self.value()
+        flag_list = []
+        for flag, mask in self._flags.iteritems():
+            if value & mask:
+                flag_list.append('%s ' % flag.upper())
+
+        return ''.join(flag_list)
 
 
 @register_cpu
-class X8664Cpu(Cpu):
-    _registers = OrderedDict([('gp', ('rax rcx rdx rbx rsp rbp rsi rdi r8 r9 '
-                                      'r10 r11 r12 r13 r14 r15').split()),
+class X86Cpu(Cpu):
+    _registers = OrderedDict([('gp', ('eax ecx edx ebx esp ebp esi '
+                                      'edi').split()),
                               ('fp', ('st0 st1 st2 st3 st4 st5 st6 '
                                       'st7').split()),
-                              ('sp', ('cs ss ds es fs gs rip').split())])
+                              ('sp', ('cs ss ds es fs gs eip').split())])
 
     def __init__(self):
         registers = OrderedDict()
         for group, register_list in self._registers.iteritems():
             registers[group] = [Register(x) for x in register_list]
         registers['sp'].append(EflagsRegister('eflags'))
-        super(X8664Cpu, self).__init__(registers)
+        super(X86Cpu, self).__init__(registers)
 
     @staticmethod
     def architecture():
-        return Architecture.X86_64
+        return Architecture.X86
 
     def stack_pointer(self):
-        return self.register('rsp')
+        return self.register('esp')
 
     def instruction_pointer(self):
-        return self.register('rip')
+        return self.register('eip')

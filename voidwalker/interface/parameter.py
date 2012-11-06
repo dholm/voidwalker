@@ -44,6 +44,11 @@ class ParameterEnum(Parameter):
         raise NotImplementedError
 
 
+class ParameterInteger(Parameter):
+    def default_value(self):
+        raise NotImplementedError
+
+
 @singleton_specification
 class ParameterFactory(object):
     def create_parameter(self, parameter_type):

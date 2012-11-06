@@ -14,6 +14,7 @@ GDB 7.5 or later built with support for Python extensions.
 Currently (void)walker has support for the following architectures, but adding
 new ones should be fairly easy at this point.
 
+ * X86
  * X86-64
  * MIPS
 
@@ -65,14 +66,13 @@ following line to *~/.gdbinit*:
 
 Controlling what is shown as part of a context:
 
-    voidwalker-show-registers
-    voidwalker-show-stack
-    voidwalker-show-instructions
+    voidwalker-context-stackdw <number of doublewords>
+    voidwalker-context-instructions <number of instructions>
 
 For instance, to suppress the stack from being dumped when calling *voidwalker
 context* add the following line to ~/.gdbinit:
 
-    set voidwalker-show-stack off
+    set voidwalker-context-stackdw 0
 
 
 ## Themes

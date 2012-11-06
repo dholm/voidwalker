@@ -14,55 +14,43 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import re
 from collections import OrderedDict
 
-from .cpu import Register
-
-
-class ContextRegister(Register):
-    def __init__(self, register):
-        super(ContextRegister, self).__init__(register.name())
-        self._size = register.size()
-        self._value = register.value()
-
-    def size(self):
-        return self._size
-
-    def value(self):
-        return self._value
+from ..interface.parameters.context import ContextInstructionsParameter
+from ..interface.parameters.context import ContextStackParameter
 
 
 class Context(object):
-    _TOTAL_INSTRUCTIONS = 6
-    _STACK_LINES = 6
-
-    _instruction_exp = re.compile((r'(?P<meta>\S+)?\s*'
-                                   r'(?P<address>0x[0-9a-f]+){1}\s*'
-                                   r'(?P<symbol><.+>){0,1}:\s*'
-                                   r'(?P<mnemonic>\S+){1}\s*'
-                                   r'(?P<operands>.+)?$'),
-                                  re.IGNORECASE)
-
-    _data_exp = re.compile((r'(?:\s*(?P<address>0x[0-9a-f]+):\s*)'
-                            r'(?P<data>(?:\s*0x[0-9a-f]+)+\s*)'),
-                           re.IGNORECASE)
-
-    def __init__(self):
+    def __init__(self, instruction_pointer):
         self._registers = OrderedDict()
         self._stack = None
-        self._instructions = []
+        self._instructions = OrderedDict()
+
+        self._instruction_pointer = instruction_pointer
+
+    def _param_stackdw(self):
+        return ContextStackParameter.get_value()
+
+    def _param_instructions(self):
+        return ContextInstructionsParameter.get_value()
 
     def stack(self):
         return self._stack
 
     def register(self, name):
-        if name not in self._registers:
-            return None
-        return self._registers[name]
+        for register_dict in self._registers.itervalues():
+            if name in register_dict:
+                return register_dict[name]
+
+        return None
 
     def registers(self):
         return self._registers.iteritems()
 
     def instructions(self):
-        return iter(self._instructions)
+        if not len(self._instructions):
+            return None
+        return self._instructions.iteritems()
+
+    def instruction_pointer(self):
+        return self.register(self._instruction_pointer)

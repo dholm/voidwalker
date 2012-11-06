@@ -26,6 +26,9 @@ class DataChunk(object):
         self._address = address
         self._buffer = data_buffer
 
+    def __len__(self):
+        return len(self._buffer)
+
     def address(self):
         return self._address
 
@@ -55,7 +58,7 @@ class DataWidget(Widget):
             ascii_string = []
             for octuple in grouper(8, line):
                 for quadruple in grouper(4, octuple):
-                    hex_string += [(' %02x' % ord(i))
+                    hex_string += [(' %02X' % ord(i))
                                    for i in quadruple
                                    if i is not None]
                     filtered = ''.join([x.translate(self._ascii_filter)
@@ -67,7 +70,7 @@ class DataWidget(Widget):
                 ascii_string += ['  ']
 
             row = Table.Row()
-            row.add_cell(Table.Cell('0x%016x:' % address))
+            row.add_cell(Table.Cell('0x%016X:' % address))
             row.add_cell(Table.Cell(''.join(hex_string)))
             row.add_cell(Table.Cell(''.join(ascii_string)))
             table.add_row(row)

@@ -15,14 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..parameter import Parameter
-from ..parameter import ParameterBoolean
 from ..parameter import register_parameter
 from .voidwalker import VoidwalkerParameter
 
 
 @register_parameter
 class ShowParameter(Parameter):
-    show_doc = '(void)walker show parameters'
+    '''(void)walker show parameters'''
 
     def __init__(self):
         super(ShowParameter, self).__init__()
@@ -33,48 +32,3 @@ class ShowParameter(Parameter):
     @staticmethod
     def name():
         return '%s %s' % (VoidwalkerParameter.name(), 'show')
-
-
-@register_parameter
-class ShowRegistersParameter(ParameterBoolean):
-    show_doc = 'Show registers is set to'
-
-    def __init__(self):
-        super(ShowRegistersParameter, self).__init__()
-
-    def default_value(self):
-        return True
-
-    @staticmethod
-    def name():
-        return '%s %s' % (ShowParameter.name(), 'registers')
-
-
-@register_parameter
-class ShowStackParameter(ParameterBoolean):
-    show_doc = 'Show stack is set to'
-
-    def __init__(self):
-        super(ShowStackParameter, self).__init__()
-
-    def default_value(self):
-        return True
-
-    @staticmethod
-    def name():
-        return '%s %s' % (ShowParameter.name(), 'stack')
-
-
-@register_parameter
-class ShowInstructionsParameter(ParameterBoolean):
-    show_doc = 'Show instructions is set to'
-
-    def __init__(self):
-        super(ShowInstructionsParameter, self).__init__()
-
-    def default_value(self):
-        return True
-
-    @staticmethod
-    def name():
-        return '%s %s' % (ShowParameter.name(), 'instructions')

@@ -19,7 +19,7 @@ from ..utils.decorators import singleton_specification
 
 @singleton_specification
 class PlatformFactory(object):
-    def create_register(self, name):
+    def create_register(self, register):
         raise NotImplementedError
 
     def create_context(self, inferior, thread):

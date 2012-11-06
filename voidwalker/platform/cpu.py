@@ -28,6 +28,13 @@ class Architecture:
 
 
 class Register(object):
+    _register_fmt = {16: '0x%032lX',
+                     10: '0x%020lX',
+                     8: '0x%016lX',
+                     4: '0x%08lX',
+                     2: '0x%04lX',
+                     1: '0x%02lX'}
+
     def __init__(self, name):
         self._name = name
 
@@ -40,23 +47,75 @@ class Register(object):
     def value(self):
         raise NotImplementedError
 
+    def str(self):
+        if self.value() is not None:
+            return self._register_fmt[self.size()] % self.value()
+        chars_per_byte = 2
+        return ''.join(['-' * (self.size() * chars_per_byte)])
+
+
+def create_static_register(register):
+    class StaticRegister(type(register), object):
+        def __init__(self, name):
+            super(StaticRegister, self).__init__(name)
+            self._size = register.size()
+            self._value = register.value()
+
+        def size(self):
+            return self._size
+
+        def value(self):
+            return self._value
+
+    return StaticRegister(register.name())
+
 
 class Cpu(object):
-    def __init__(self, register_list):
+    def __init__(self, registers):
         self._registers = OrderedDict()
-        for name in iter(register_list):
-            self._registers[name] = PlatformFactory().create_register(name)
+        for group, register_list in registers.iteritems():
+            registers = OrderedDict([(x.name(),
+                                      PlatformFactory().create_register(x))
+                                     for x in register_list])
+
+            self._registers[group] = registers
 
     @staticmethod
     def architecture():
         raise NotImplementedError
 
     def register(self, name):
-        assert name in self._registers
-        return self._registers[name]
+        for register_dict in self._registers.itervalues():
+            if name in register_dict:
+                return register_dict[name]
+
+        return None
 
     def registers(self):
         return self._registers.iteritems()
 
     def stack_pointer(self):
         raise NotImplementedError
+
+    def instruction_pointer(self):
+        raise NotImplementedError
+
+
+class Instruction(object):
+    def __init__(self, raw, mnemonic, operands, symbol=None):
+        self._raw = raw
+        self._mnemonic = mnemonic
+        self._operands = operands
+        self._symbol = symbol
+
+    def data(self):
+        return self._raw
+
+    def mnemonic(self):
+        return self._mnemonic
+
+    def operands(self):
+        return self._operands
+
+    def symbol(self):
+        return self._symbol
