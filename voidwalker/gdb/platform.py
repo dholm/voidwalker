@@ -19,10 +19,10 @@ import gdb
 import re
 
 from ..platform.context import Context
-from ..platform.cpu import Instruction
 from ..platform.cpu import create_static_register
 from ..platform.factory import PlatformFactory
 from ..types.data import DataChunk
+from ..types.instructions import Instruction
 from ..utils.decorators import singleton_implementation
 
 
@@ -60,7 +60,7 @@ class GdbPlatformFactory(object):
         class GdbContext(Context):
             _instruction_exp = re.compile((r'(?P<meta>\S+)?\s*'
                                            r'(?P<address>0x[0-9a-f]+){1}\s*'
-                                           r'(?P<symbol><.+>){0,1}:\s*'
+                                           r'(?:<(?P<symbol>.+)>){0,1}:\s*'
                                            r'(?P<mnemonic>\S+){1}\s*'
                                            r'(?P<operands>.+)?$'),
                                           re.IGNORECASE)
@@ -99,13 +99,14 @@ class GdbPlatformFactory(object):
                     symbol = parsed[i]['symbol']
                     mnemonic = parsed[i]['mnemonic']
                     operands = parsed[i]['operands']
-                    self._instructions[address] = Instruction(data, mnemonic,
-                                                              operands, symbol)
+                    instruction = Instruction(data, mnemonic, operands, symbol)
+                    self._instruction_listing.add_instruction(address,
+                                                              instruction)
 
             def __init__(self):
                 cpu = inferior.cpu()
-                instruction_pointer = cpu.instruction_pointer().name()
-                super(GdbContext, self).__init__(instruction_pointer)
+                program_counter = cpu.program_counter().name()
+                super(GdbContext, self).__init__(program_counter)
 
                 self._update_registers()
                 self._update_stack()

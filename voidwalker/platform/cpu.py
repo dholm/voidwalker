@@ -97,25 +97,5 @@ class Cpu(object):
     def stack_pointer(self):
         raise NotImplementedError
 
-    def instruction_pointer(self):
+    def program_counter(self):
         raise NotImplementedError
-
-
-class Instruction(object):
-    def __init__(self, raw, mnemonic, operands, symbol=None):
-        self._raw = raw
-        self._mnemonic = mnemonic
-        self._operands = operands
-        self._symbol = symbol
-
-    def data(self):
-        return self._raw
-
-    def mnemonic(self):
-        return self._mnemonic
-
-    def operands(self):
-        return self._operands
-
-    def symbol(self):
-        return self._symbol

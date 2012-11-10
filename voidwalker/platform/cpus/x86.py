@@ -73,5 +73,5 @@ class X86Cpu(Cpu):
     def stack_pointer(self):
         return self.register('esp')
 
-    def instruction_pointer(self):
+    def program_counter(self):
         return self.register('eip')

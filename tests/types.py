@@ -17,12 +17,23 @@
 from array import array
 from unittest import TestCase
 
-from voidwalker.ui.terminal import SysTerminal
 from voidwalker.types.data import DataChunk
 from voidwalker.types.data import DataWidget
+from voidwalker.types.instructions import Instruction
+from voidwalker.types.instructions import InstructionListing
+from voidwalker.types.instructions import InstructionListingWidget
+from voidwalker.ui.terminal import SysTerminal
 
 
 class WidgetsTest(TestCase):
+    def _draw_widget(self, widget):
+        self._terminal.write('\n\t# Current terminal width #\n')
+        widget.draw(self._terminal, self._terminal.width())
+
+        self._terminal.write(('\n\t# Default width (%d) #\n' %
+                              self._terminal.DEFAULT_WIDTH))
+        widget.draw(self._terminal, self._terminal.DEFAULT_WIDTH)
+
     def setUp(self):
         self._terminal = SysTerminal()
 
@@ -38,10 +49,30 @@ class WidgetsTest(TestCase):
         data = '\x00test\x12\x67\x90\xff\x0042\xff\x15\x16'
         data_chunk = DataChunk(address, buffer(data))
         data_widget = DataWidget(data_chunk)
+        self._draw_widget(data_widget)
 
-        self._terminal.write('\n\t# Current terminal width #\n')
-        data_widget.draw(self._terminal, self._terminal.width())
+    def test_instruction(self):
+        opcode = array('c', ['\x83', '\xc0', '\x02'])
+        mnemonic = 'add'
+        operands = '$0x2,%%eax'
+        symbol = '<main+20>'
+        instruction = Instruction(opcode, mnemonic, operands, symbol)
+        self.assertEqual(opcode, instruction.opcode())
+        self.assertEqual(mnemonic, instruction.mnemonic())
+        self.assertEqual(operands, instruction.operands())
+        self.assertEqual(symbol, instruction.symbol())
 
-        self._terminal.write(('\n\t# Default width (%d) #\n' %
-                              self._terminal.DEFAULT_WIDTH))
-        data_widget.draw(self._terminal, self._terminal.DEFAULT_WIDTH)
+    def test_instruction_listing(self):
+        listing = InstructionListing()
+        listing.add_instruction(0xed4, Instruction(array('c', ['\x83', '\xc0',
+                                                               '\x02']),
+                                                   'add', '$0x2,%%eax',
+                                                   '<main+20>'))
+        long_symbol_name = ['x' for x in range(self._terminal.DEFAULT_WIDTH)]
+        listing.add_instruction(0xed7, Instruction(array('c', ['\x48', '\x89',
+                                                               '\xc7']),
+                                                   'mov', '%%rax,%%rdi',
+                                                   ''.join(long_symbol_name)))
+
+        listing_widget = InstructionListingWidget(listing, 0xed4)
+        self._draw_widget(listing_widget)

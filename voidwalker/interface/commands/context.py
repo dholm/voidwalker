@@ -17,6 +17,7 @@
 from ...platform.factory import PlatformFactory
 from ...target.inferior import InferiorManager
 from ...types.data import DataWidget
+from ...types.instructions import InstructionListingWidget
 from ...ui.widgets import Section
 from ...ui.widgets import Table
 from ...ui.widgets import Widget
@@ -70,42 +71,10 @@ class ContextWidget(Widget):
         section.add_component(DataWidget(context.stack()))
         return section
 
-    def _create_instructions_section(self, context):
-        table = Table()
-        instruction_pointer = context.instruction_pointer().value()
-        for address, instruction in context.instructions():
-            row = Table.Row()
-
-            const_face = '%(face-normal)s'
-            if address == instruction_pointer:
-                const_face = '%(face-underlined)s'
-            row.add_cell(Table.Cell('%s0x%016lX:' % (const_face, address)))
-
-            if instruction.symbol() is not None:
-                row.add_cell(Table.Cell('%(face-identifier)s' +
-                                        instruction.symbol()))
-            else:
-                row.add_cell(Table.Cell())
-
-            hex_string = [('%02X' % ord(i))
-                          for i in instruction.data()
-                          if i is not None]
-            row.add_cell(Table.Cell('%s%s' % (const_face,
-                                              ' '.join(hex_string))))
-
-            row.add_cell(Table.Cell('%s%s' % ('%(face-statement)s',
-                                              instruction.mnemonic())))
-
-            if instruction.operands() is not None:
-                row.add_cell(Table.Cell('%s%s' % ('%(face-statement)s',
-                                                  instruction.operands())))
-            else:
-                row.add_cell(Table.Cell())
-
-            table.add_row(row)
-
+    def _create_code_section(self, context):
         section = Section('code')
-        section.add_component(table)
+        listing = InstructionListingWidget(context.instruction_listing())
+        section.add_component(listing)
         return section
 
     def draw(self, terminal, width):
@@ -118,8 +87,8 @@ class ContextWidget(Widget):
             stack = self._create_stack_section(self._context)
             section.add_component(stack)
 
-        if self._context.instructions() is not None:
-            instructions = self._create_instructions_section(self._context)
+        if len(self._context.instruction_listing()):
+            instructions = self._create_code_section(self._context)
             section.add_component(instructions)
 
         section.draw(terminal, width)

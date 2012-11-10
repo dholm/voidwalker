@@ -18,15 +18,16 @@ from collections import OrderedDict
 
 from ..interface.parameters.context import ContextInstructionsParameter
 from ..interface.parameters.context import ContextStackParameter
+from ..types.instructions import InstructionListing
 
 
 class Context(object):
-    def __init__(self, instruction_pointer):
+    def __init__(self, program_counter):
         self._registers = OrderedDict()
         self._stack = None
-        self._instructions = OrderedDict()
+        self._instruction_listing = InstructionListing()
 
-        self._instruction_pointer = instruction_pointer
+        self._program_counter = program_counter
 
     def _param_stackdw(self):
         return ContextStackParameter.get_value()
@@ -47,10 +48,8 @@ class Context(object):
     def registers(self):
         return self._registers.iteritems()
 
-    def instructions(self):
-        if not len(self._instructions):
-            return None
-        return self._instructions.iteritems()
+    def instruction_listing(self):
+        return self._instruction_listing
 
-    def instruction_pointer(self):
-        return self.register(self._instruction_pointer)
+    def program_counter(self):
+        return self.register(self._program_counter)

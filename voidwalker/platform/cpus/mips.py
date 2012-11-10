@@ -166,5 +166,5 @@ class MipsCpu(Cpu):
     def stack_pointer(self):
         return self.register('sp')
 
-    def instruction_pointer(self):
+    def program_counter(self):
         return self.register('pc')
