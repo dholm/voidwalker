@@ -17,12 +17,13 @@
 from array import array
 from unittest import TestCase
 
-from voidwalker.types.data import DataChunk
-from voidwalker.types.data import DataWidget
-from voidwalker.types.instructions import Instruction
-from voidwalker.types.instructions import InstructionListing
-from voidwalker.types.instructions import InstructionListingWidget
-from voidwalker.ui.terminal import SysTerminal
+from framework.types.data import DataChunk
+from framework.types.data import DataWidget
+from framework.types.instructions import Instruction
+from framework.types.instructions import InstructionListing
+from framework.types.instructions import InstructionListingWidget
+
+from backends.test.terminal import SysTerminal
 
 
 class WidgetsTest(TestCase):

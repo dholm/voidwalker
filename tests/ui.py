@@ -16,12 +16,14 @@
 
 from unittest import TestCase
 
-from voidwalker.ui.terminal import SysTerminal
-from voidwalker.ui.theme import ThemeManager
-from voidwalker.ui.themes.solarized import Solarized
-from voidwalker.ui.themes.zenburn import Zenburn
-from voidwalker.ui.widgets import Section
-from voidwalker.ui.widgets import Table
+from framework.ui.theme import ThemeManager
+from framework.ui.widgets import Section
+from framework.ui.widgets import Table
+
+from application.themes.solarized import Solarized
+from application.themes.zenburn import Zenburn
+
+from backends.test.terminal import SysTerminal
 
 
 class ThemeTest(object):

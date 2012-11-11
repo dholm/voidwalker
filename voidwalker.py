@@ -20,19 +20,20 @@ import sys
 voidwalker_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 sys.path.append(os.path.dirname(voidwalker_path))
 
-# Register all commands, parameters, cpus and themes
-from voidwalker.gdb import *
-from voidwalker.interface.commands import *
-from voidwalker.interface.parameters import *
-from voidwalker.platform.cpus import *
-from voidwalker.ui.themes import *
 
-from voidwalker.gdb.convenience import ConvenienceManager
-from voidwalker.gdb.terminal import GdbTerminal
-from voidwalker.interface.command import CommandManager
-from voidwalker.interface.parameter import ParameterManager
-from voidwalker.target.inferior import InferiorManager
-from voidwalker.ui.theme import ThemeManager
+# Load GDB backend
+from backends.gdb import *
+
+# Register all commands, parameters, cpus and themes
+from application import *
+
+from backends.gdb.convenience import ConvenienceManager
+from backends.gdb.terminal import GdbTerminal
+
+from framework.interface.command import CommandManager
+from framework.interface.parameter import ParameterManager
+from framework.target.inferior import InferiorManager
+from framework.ui.theme import ThemeManager
 
 
 version = '0.0.0'

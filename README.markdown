@@ -40,7 +40,11 @@ Dumping the context of the current stack frame:
 
 Dumping data by specifying address and length:
 
-    voidwalker dump <address> <length>
+    voidwalker dump data <address> <length>
+
+Dumping disassembly by specifying address and the number of instructions:
+
+    voidwalker dump instructions <address> <length>
 
 
 ### Hooks

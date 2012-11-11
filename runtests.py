@@ -19,11 +19,13 @@
 import sys
 import unittest
 
-from voidwalker.interface.parameter import ParameterFactory
-from voidwalker.interface.parameter import ParameterManager
-from voidwalker.ui.terminal import SysTerminal
-from voidwalker.ui.theme import ThemeManager
-from voidwalker.utils.decorators import singleton_implementation
+from framework.interface.parameter import ParameterFactory
+from framework.interface.parameter import ParameterManager
+from framework.ui.theme import ThemeManager
+from framework.utils.decorators import singleton_implementation
+
+from backends.test.terminal import SysTerminal
+
 import tests
 
 

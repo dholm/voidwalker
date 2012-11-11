@@ -16,19 +16,20 @@
 
 from unittest import TestCase
 
-from voidwalker.interface.command import Command
-from voidwalker.interface.command import CommandFactory
-from voidwalker.interface.command import CommandManager
-from voidwalker.interface.command import DataCommand
-from voidwalker.interface.command import register_command
-from voidwalker.interface.parameter import Parameter
-from voidwalker.interface.parameter import ParameterBoolean
-from voidwalker.interface.parameter import ParameterEnum
-from voidwalker.interface.parameter import ParameterFactory
-from voidwalker.interface.parameter import ParameterManager
-from voidwalker.interface.parameter import register_parameter
-from voidwalker.ui.terminal import SysTerminal
-from voidwalker.utils.decorators import singleton_implementation
+from framework.interface.command import Command
+from framework.interface.command import CommandFactory
+from framework.interface.command import CommandManager
+from framework.interface.command import DataCommand
+from framework.interface.command import register_command
+from framework.interface.parameter import Parameter
+from framework.interface.parameter import ParameterBoolean
+from framework.interface.parameter import ParameterEnum
+from framework.interface.parameter import ParameterFactory
+from framework.interface.parameter import ParameterManager
+from framework.interface.parameter import register_parameter
+from framework.utils.decorators import singleton_implementation
+
+from backends.test.terminal import SysTerminal
 
 from .target import TestInferior
 

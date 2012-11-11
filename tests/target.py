@@ -16,11 +16,11 @@
 
 from unittest import TestCase
 
-from voidwalker.target.inferior import Inferior
-from voidwalker.target.inferior import InferiorManager
-from voidwalker.target.inferior import TargetFactory
-from voidwalker.target.thread import Thread
-from voidwalker.utils.decorators import singleton_implementation
+from framework.target.inferior import Inferior
+from framework.target.inferior import InferiorManager
+from framework.target.inferior import TargetFactory
+from framework.target.thread import Thread
+from framework.utils.decorators import singleton_implementation
 
 from .platform import TestCpu
 

@@ -17,20 +17,21 @@
 from collections import OrderedDict
 from unittest import TestCase
 
-from voidwalker.platform.architecture import ArchitectureManager
-from voidwalker.platform.architecture import register_cpu
-from voidwalker.platform.context import Context
-from voidwalker.platform.cpu import Architecture
-from voidwalker.platform.cpu import Cpu
-from voidwalker.platform.cpu import Register
-from voidwalker.platform.cpu import create_static_register
-from voidwalker.platform.cpus.mips import MipsCpu
-from voidwalker.platform.cpus.x86 import X86Cpu
-from voidwalker.platform.cpus.x86_64 import X8664Cpu
-from voidwalker.platform.factory import PlatformFactory
-from voidwalker.target.inferior import InferiorManager
-from voidwalker.target.inferior import TargetFactory
-from voidwalker.utils.decorators import singleton_implementation
+from framework.platform.architecture import ArchitectureManager
+from framework.platform.architecture import register_cpu
+from framework.platform.context import Context
+from framework.platform.cpu import Architecture
+from framework.platform.cpu import Cpu
+from framework.platform.cpu import Register
+from framework.platform.cpu import create_static_register
+from framework.platform.factory import PlatformFactory
+from framework.target.inferior import InferiorManager
+from framework.target.inferior import TargetFactory
+from framework.utils.decorators import singleton_implementation
+
+from application.cpus.mips import MipsCpu
+from application.cpus.x86 import X86Cpu
+from application.cpus.x86_64 import X8664Cpu
 
 
 @register_cpu
