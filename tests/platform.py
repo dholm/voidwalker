@@ -14,85 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 from unittest import TestCase
 
 from framework.platform.architecture import ArchitectureManager
-from framework.platform.architecture import register_cpu
-from framework.platform.context import Context
-from framework.platform.cpu import Architecture
-from framework.platform.cpu import Cpu
-from framework.platform.cpu import Register
-from framework.platform.cpu import create_static_register
 from framework.platform.factory import PlatformFactory
 from framework.target.inferior import InferiorManager
 from framework.target.inferior import TargetFactory
-from framework.utils.decorators import singleton_implementation
 
 from application.cpus.mips import MipsCpu
 from application.cpus.x86 import X86Cpu
 from application.cpus.x86_64 import X8664Cpu
 
-
-@register_cpu
-class TestCpu(Cpu):
-    register_dict = OrderedDict([('gp', ('r0 r1').split()),
-                                 ('sp', ('pc sp flags').split())])
-
-    def __init__(self):
-        registers = OrderedDict()
-        for group, register_list in self.register_dict.iteritems():
-            registers[group] = [Register(x) for x in register_list]
-        super(TestCpu, self).__init__(registers)
-
-    @staticmethod
-    def architecture():
-        return Architecture.Test
-
-    def stack_pointer(self):
-        return self.register('sp')
-
-    def instruction_pointer(self):
-        return self.register('pc')
-
-
-@singleton_implementation(PlatformFactory)
-class PlatformFactoryTest(object):
-    def __init__(self):
-        self._registers = None
-        self.reset()
-
-    def reset(self):
-        self._registers = {}
-
-    def create_register(self, register):
-        class TestRegister(type(register), object):
-            def __init__(self, name):
-                super(TestRegister, self).__init__(name)
-                self._size = 8
-                self._value = 0
-
-            def size(self):
-                return self._size
-
-            def value(self):
-                return self._value
-
-        self._registers[register.name()] = TestRegister(register.name())
-        return self._registers[register.name()]
-
-    def create_context(self, inferior, thread):
-        class TestContext(Context):
-            def __init__(self):
-                sp = inferior.cpu().stack_pointer()
-                super(TestContext, self).__init__(sp)
-
-                for group, register_dict in inferior.cpu().registers():
-                    register_dict = dict((x.name(), create_static_register(x))
-                                         for x in register_dict.itervalues())
-                    self._registers[group] = register_dict
-
-        return TestContext()
+from backends.test.platform import TestCpu
 
 
 class CpuTest(TestCase):

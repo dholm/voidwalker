@@ -16,49 +16,10 @@
 
 from unittest import TestCase
 
-from framework.target.inferior import Inferior
 from framework.target.inferior import InferiorManager
 from framework.target.inferior import TargetFactory
-from framework.target.thread import Thread
-from framework.utils.decorators import singleton_implementation
 
 from .platform import TestCpu
-
-
-class TestThread(Thread):
-    def __init__(self, inferior_id, thread_id):
-        super(TestThread, self).__init__(inferior_id)
-        self._thread_id = thread_id
-
-    def name(self):
-        return ('thread %d' % self._thread_id)
-
-    def id(self):
-        return self._thread_id
-
-
-class TestInferior(Inferior):
-    def __init__(self, cpu, inferior_id):
-        super(TestInferior, self).__init__(cpu)
-        self._id = inferior_id
-
-    def id(self):
-        return self._id
-
-
-@singleton_implementation(TargetFactory)
-class TestTargetFactory(object):
-    def __init__(self):
-        pass
-
-    def create_inferior(self, inferior_id):
-        cpu = TestCpu()
-        return TestInferior(cpu, inferior_id)
-
-    def create_thread(self, inferior, thread_id):
-        thread = TestThread(inferior.id(), thread_id)
-        inferior.add_thread(thread)
-        return thread
 
 
 class InferiorTest(TestCase):

@@ -14,4 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['terminal']
+__all__ = ['terminal',
+           'platform',
+           'target',
+           'interface']

@@ -34,17 +34,26 @@ class Parameter(object):
         raise NotImplementedError
 
 
-class ParameterBoolean(Parameter):
+class PrefixParameter(Parameter):
+    @classmethod
+    def get_value(cls):
+        raise TypeError
+
     def default_value(self):
         raise NotImplementedError
 
 
-class ParameterEnum(Parameter):
+class BooleanParameter(Parameter):
+    def default_value(self):
+        raise NotImplementedError
+
+
+class EnumParameter(Parameter):
     def sequence(self):
         raise NotImplementedError
 
 
-class ParameterInteger(Parameter):
+class IntegerParameter(Parameter):
     def default_value(self):
         raise NotImplementedError
 

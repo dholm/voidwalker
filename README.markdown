@@ -78,6 +78,10 @@ context* add the following line to ~/.gdbinit:
 
     set voidwalker-context-stackdw 0
 
+Modifying what is performed when hooks are executed by GDB:
+
+    voidwalker-hook-context <on/off>
+
 
 ## Themes
 

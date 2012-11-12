@@ -18,9 +18,46 @@ import gdb
 
 from framework.interface.command import Command
 from framework.interface.command import register_command
+from framework.interface.parameter import BooleanParameter
+from framework.interface.parameter import PrefixParameter
+from framework.interface.parameter import register_parameter
+
 
 from application.commands.context import ContextCommand
 from application.commands.voidwalker import VoidwalkerCommand
+from application.parameters.voidwalker import VoidwalkerParameter
+
+
+@register_parameter
+class HookParameter(PrefixParameter):
+    '''(void)walker hook parameters'''
+
+    def __init__(self):
+        super(HookParameter, self).__init__()
+
+    def default_value(self):
+        return None
+
+    @staticmethod
+    def name():
+        return '%s %s' % (VoidwalkerParameter.name(), 'hook')
+
+
+@register_parameter
+class ContextHookParameter(BooleanParameter):
+    '''Dump context when relevant hooks are called'''
+
+    DEFAULT_VALUE = True
+
+    def __init__(self):
+        super(ContextHookParameter, self).__init__()
+
+    @staticmethod
+    def name():
+        return '%s %s' % (HookParameter.name(), 'context')
+
+    def default_value(self):
+        return self.DEFAULT_VALUE
 
 
 @register_command
@@ -47,4 +84,5 @@ to your ~/.gdbinit:
         return '%s %s' % (VoidwalkerCommand.name(), 'hook-stop')
 
     def invoke(self, inferior, argument):
-        gdb.execute(ContextCommand.name())
+        if ContextHookParameter.get_value():
+            gdb.execute(ContextCommand.name())

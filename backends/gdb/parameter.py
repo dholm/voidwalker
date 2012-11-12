@@ -16,52 +16,80 @@
 
 import gdb
 
+from framework.interface.parameter import BooleanParameter
+from framework.interface.parameter import EnumParameter
+from framework.interface.parameter import IntegerParameter
 from framework.interface.parameter import Parameter
-from framework.interface.parameter import ParameterBoolean
-from framework.interface.parameter import ParameterEnum
 from framework.interface.parameter import ParameterFactory
-from framework.interface.parameter import ParameterInteger
+from framework.interface.parameter import PrefixParameter
 from framework.utils.decorators import singleton_implementation
+
+
+class GdbBaseParameter(gdb.Parameter, object):
+    def __init__(self, name, command, param, sequence=None):
+        if param == gdb.PARAM_ENUM:
+            gdb.Parameter.__init__(self, name, command, param, sequence)
+        else:
+            gdb.Parameter.__init__(self, name, command, param)
+
+    def get_set_string(self):
+        return str(self.value)
+
+    def get_show_string(self, value):
+        return value
 
 
 @singleton_implementation(ParameterFactory)
 class GdbParameterFactory(object):
     def create_parameter(self, parameter_type):
-        if issubclass(parameter_type, ParameterEnum):
-            class GdbParameterEnum(gdb.Parameter, parameter_type):
+        if issubclass(parameter_type, EnumParameter):
+            class GdbParameterEnum(GdbBaseParameter, parameter_type):
+                show_doc = parameter_type.__doc__
+                set_doc = parameter_type.__doc__
+
                 def __init__(self):
                     parameter_type.__init__(self)
                     gdb_name = parameter_type.name().replace(' ', '-')
-                    gdb.Parameter.__init__(self, gdb_name, gdb.COMMAND_SUPPORT,
-                                           gdb.PARAM_ENUM,
-                                           parameter_type.sequence(self))
+                    GdbBaseParameter.__init__(self, gdb_name,
+                                              gdb.COMMAND_SUPPORT,
+                                              gdb.PARAM_ENUM,
+                                              parameter_type.sequence(self))
                     self.value = parameter_type.default_value(self)
 
             return GdbParameterEnum()
 
-        elif issubclass(parameter_type, ParameterInteger):
-            class GdbParameterInteger(gdb.Parameter, parameter_type):
+        elif issubclass(parameter_type, IntegerParameter):
+            class GdbParameterInteger(GdbBaseParameter, parameter_type):
+                show_doc = parameter_type.__doc__
+                set_doc = parameter_type.__doc__
+
                 def __init__(self):
                     parameter_type.__init__(self)
                     gdb_name = parameter_type.name().replace(' ', '-')
-                    gdb.Parameter.__init__(self, gdb_name, gdb.COMMAND_SUPPORT,
-                                           gdb.PARAM_ZINTEGER)
+                    GdbBaseParameter.__init__(self, gdb_name,
+                                              gdb.COMMAND_SUPPORT,
+                                              gdb.PARAM_ZINTEGER)
                     self.value = parameter_type.default_value(self)
 
             return GdbParameterInteger()
 
-        elif issubclass(parameter_type, ParameterBoolean):
-            class GdbParameterBoolean(gdb.Parameter, parameter_type):
+        elif issubclass(parameter_type, BooleanParameter):
+            class GdbParameterBoolean(GdbBaseParameter, parameter_type):
+                show_doc = parameter_type.__doc__
+                set_doc = parameter_type.__doc__
+
                 def __init__(self):
                     parameter_type.__init__(self)
                     gdb_name = parameter_type.name().replace(' ', '-')
-                    gdb.Parameter.__init__(self, gdb_name, gdb.COMMAND_SUPPORT,
-                                           gdb.PARAM_BOOLEAN)
+                    GdbBaseParameter.__init__(self, gdb_name,
+                                              gdb.COMMAND_SUPPORT,
+                                              gdb.PARAM_BOOLEAN)
                     self.value = parameter_type.default_value(self)
 
             return GdbParameterBoolean()
 
-        elif issubclass(parameter_type, Parameter):
+        elif (issubclass(parameter_type, Parameter) or
+              issubclass(parameter_type, PrefixParameter)):
             class GdbParameter(parameter_type):
                 def __init__(self):
                     parameter_type.__init__(self)

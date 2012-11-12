@@ -14,12 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from framework.interface.parameter import Parameter
+from framework.interface.parameter import PrefixParameter
 from framework.interface.parameter import register_parameter
 
 
 @register_parameter
-class VoidwalkerParameter(Parameter):
+class VoidwalkerParameter(PrefixParameter):
     '''(void)walker parameters'''
 
     def __init__(self):

@@ -14,15 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from framework.interface.parameter import Parameter
-from framework.interface.parameter import ParameterInteger
+from framework.interface.parameter import PrefixParameter
+from framework.interface.parameter import IntegerParameter
 from framework.interface.parameter import register_parameter
 
 from .voidwalker import VoidwalkerParameter
 
 
 @register_parameter
-class ContextParameter(Parameter):
+class ContextParameter(PrefixParameter):
     '''(void)walker context command parameters'''
 
     def __init__(self):
@@ -37,7 +37,7 @@ class ContextParameter(Parameter):
 
 
 @register_parameter
-class ContextStackParameter(ParameterInteger):
+class ContextStackParameter(IntegerParameter):
     '''Number of doublewords of stack
 
 Controls the number of doublewords of stack to include in each context.'''
@@ -58,7 +58,7 @@ Controls the number of doublewords of stack to include in each context.'''
 
 
 @register_parameter
-class ContextInstructionsParameter(ParameterInteger):
+class ContextInstructionsParameter(IntegerParameter):
     '''Number of instructions
 
 The total number of instructions to include in each context.'''

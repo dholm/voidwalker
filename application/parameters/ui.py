@@ -15,14 +15,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from framework.ui.theme import ThemeManager
-from framework.interface.parameter import ParameterEnum
+from framework.interface.parameter import EnumParameter
 from framework.interface.parameter import register_parameter
 
 from .voidwalker import VoidwalkerParameter
 
 
 @register_parameter
-class ThemeParameter(ParameterEnum):
+class ThemeParameter(EnumParameter):
     '''(void)walker theme
 
 The theme to use for the (void)walker flow UI.'''
