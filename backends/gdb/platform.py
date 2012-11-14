@@ -60,13 +60,6 @@ class GdbPlatformFactory(object):
 
     def create_context(self, inferior, thread):
         class GdbContext(Context):
-            _instruction_exp = re.compile((r'(?P<meta>\S+)?\s*'
-                                           r'(?P<address>0x[0-9a-f]+){1}\s*'
-                                           r'(?:<(?P<symbol>.+)>){0,1}:\s*'
-                                           r'(?P<mnemonic>\S+){1}\s*'
-                                           r'(?P<operands>.+)?$'),
-                                          re.IGNORECASE)
-
             def _param_stackdw(self):
                 return ContextStackParameter.get_value()
 

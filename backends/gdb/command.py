@@ -16,24 +16,33 @@
 
 import gdb
 
+from framework.interface.command import BreakpointCommand
 from framework.interface.command import Command
 from framework.interface.command import CommandFactory
 from framework.interface.command import DataCommand
 from framework.interface.command import PrefixCommand
+from framework.interface.command import StackCommand
+from framework.interface.command import SupportCommand
 from framework.target.factory import TargetFactory
 from framework.target.inferior import InferiorManager
 from framework.utils.decorators import singleton_implementation
 
 
-def get_current_thread():
+def get_current_inferior():
     inferior_num = gdb.selected_inferior().num
     inferior = InferiorManager().inferior(inferior_num)
     if not inferior:
         raise gdb.GdbError(('Inferior %d does not exist!' %
                             inferior_num))
 
+    return inferior
+
+
+def get_current_thread():
     if gdb.selected_thread() is not None:
         thread_num = gdb.selected_thread().num
+
+        inferior = get_current_inferior()
         if not inferior.has_thread(thread_num):
             TargetFactory().create_thread(inferior, thread_num)
 
@@ -75,6 +84,23 @@ class GdbCommandFactory(object):
 
             return GdbDataCommand()
 
+        if issubclass(command_type, StackCommand):
+            class GdbStackCommand(gdb.Command, command_type):
+                __doc__ = command_type.__doc__
+
+                def __init__(self):
+                    command_type.__init__(self)
+                    gdb.Command.__init__(self, command_type.name(),
+                                         gdb.COMMAND_STACK, gdb.COMPLETE_NONE)
+
+                def invoke(self, argument, from_tty):
+                    thread = get_current_thread()
+                    if thread is not None:
+                        args = parse_argument_list(argument)
+                        command_type.invoke(self, thread, args, from_tty)
+
+            return GdbStackCommand()
+
         if issubclass(command_type, PrefixCommand):
             class GdbPrefixCommand(gdb.Command, command_type):
                 __doc__ = command_type.__doc__
@@ -84,8 +110,36 @@ class GdbCommandFactory(object):
                     gdb.Command.__init__(self, command_type.name(),
                                          gdb.COMMAND_USER,
                                          gdb.COMPLETE_COMMAND, True)
+                    self._terminal = None
 
             return GdbPrefixCommand()
+
+        if issubclass(command_type, SupportCommand):
+            class GdbSupportCommand(gdb.Command, command_type):
+                __doc__ = command_type.__doc__
+
+                def __init__(self):
+                    command_type.__init__(self)
+                    gdb.Command.__init__(self, command_type.name(),
+                                         gdb.COMMAND_SUPPORT,
+                                         gdb.COMPLETE_NONE, True)
+
+            return GdbSupportCommand()
+
+        if issubclass(command_type, BreakpointCommand):
+            class GdbBreakpointCommand(gdb.Command, command_type):
+                def __init__(self):
+                    gdb.Command.__init__(self, command_type.name(),
+                                         gdb.COMMAND_BREAKPOINTS,
+                                         gdb.COMPLETE_NONE)
+
+                def invoke(self, argument, from_tty):
+                    inferior = get_current_inferior()
+                    if inferior is not None:
+                        args = parse_argument_list(argument)
+                        command_type.invoke(self, inferior, args, from_tty)
+
+            return GdbBreakpointCommand()
 
         if issubclass(command_type, Command):
             class GdbCommand(gdb.Command, command_type):

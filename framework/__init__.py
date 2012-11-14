@@ -18,4 +18,5 @@ __all__ = ['utils',
            'target',
            'interface',
            'platform',
+           'patching',
            'ui']

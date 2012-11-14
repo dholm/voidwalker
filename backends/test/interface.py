@@ -36,9 +36,6 @@ class TestCommand(Command):
     def name():
         return 'test'
 
-    def init(self, terminal):
-        self._terminal = terminal
-
 
 @register_command
 class TestDataCommand(DataCommand):
@@ -48,9 +45,6 @@ class TestDataCommand(DataCommand):
     @staticmethod
     def name():
         return '%s %s' % (TestCommand.name(), 'data')
-
-    def init(self, terminal):
-        self._terminal = terminal
 
 
 @singleton_implementation(CommandFactory)

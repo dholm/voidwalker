@@ -26,6 +26,8 @@ from backends.gdb import *
 
 # Register all commands, parameters, cpus and themes
 from application import *
+from application.patching import *
+from backends.gdb.tools import *
 
 from backends.gdb.convenience import ConvenienceManager
 from backends.gdb.terminal import GdbTerminal

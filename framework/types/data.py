@@ -64,7 +64,7 @@ class DataWidget(Widget):
                     filtered = ''.join([x.translate(self._ascii_filter)
                                         for x in quadruple
                                         if x is not None])
-                    ascii_string += filtered
+                    ascii_string += filtered.replace('%', '%%')
 
                 hex_string += ['  ']
                 ascii_string += ['  ']

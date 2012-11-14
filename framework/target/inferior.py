@@ -45,6 +45,9 @@ class Inferior(object):
     def read_memory(self, address, length):
         raise NotImplementedError
 
+    def write_memory(self, buf, address):
+        raise NotImplementedError
+
 
 @singleton
 class InferiorManager(object):

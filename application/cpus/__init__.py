@@ -16,7 +16,10 @@
 
 __all__ = ['mips',
            'x86',
-           'x86_64']
+           'x86_64',
+
+           'mips_instructions',
+           'x86_instructions']
 
 # Automatically register all CPUs
 from . import *

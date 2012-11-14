@@ -46,6 +46,18 @@ Dumping disassembly by specifying address and the number of instructions:
 
     voidwalker dump instructions <address> <length>
 
+Set a breakpoint at the start of the .text section. This command can be useful
+in setting a breakpoint at start if no symbols are available.
+
+    voidwalker gdb break text
+
+The following commands can be used to patch the loaded binary. All
+modifications are applied on the loaded binary and the original file is never
+touched.
+
+    voidwalker patch snippet list
+	voidwalker patch snippet apply <name> <address>
+
 
 ### Hooks
 

@@ -21,20 +21,36 @@ from ..utils.decorators import singleton_specification
 
 
 class Command(object):
+    def __init__(self):
+        self._terminal = None
+
     def init(self, terminal):
-        raise NotImplementedError
+        self._terminal = terminal
 
 
 class PrefixCommand(Command):
-    def init(self, terminal):
-        raise NotImplementedError
+    def invoke(self, argument, from_tty):
+        self._terminal.write('%(face-error)sAttempting to invoke an '
+                             'incomplete command!\n')
 
 
 class DataCommand(Command):
-    def init(self, terminal):
+    def invoke(self, thread, argument, from_tty=False):
         raise NotImplementedError
 
+
+class StackCommand(Command):
     def invoke(self, thread, argument, from_tty=False):
+        raise NotImplementedError
+
+
+class BreakpointCommand(Command):
+    def invoke(self, inferior, argument, from_tty=False):
+        raise NotImplementedError
+
+
+class SupportCommand(Command):
+    def invoke(self, argument, from_tty=False):
         raise NotImplementedError
 
 

@@ -1,4 +1,4 @@
-# (void)walker application implementation
+# (void)walker GDB-specific features
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,8 +14,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['themes',
-           'cpus',
-           'parameters',
-           'commands',
-           'patching']
+__all__ = ['interface',
+           'breakpoints']

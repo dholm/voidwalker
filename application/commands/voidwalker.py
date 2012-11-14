@@ -28,11 +28,5 @@ https://github.com/dholm/voidwalker'''
     def name():
         return 'voidwalker'
 
-    def init(self, terminal):
-        pass
-
     def __init__(self):
         super(VoidwalkerCommand, self).__init__()
-
-    def invoke(self, argument, from_tty):
-        pass

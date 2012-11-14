@@ -76,9 +76,6 @@ to your ~/.gdbinit:
         super(VoidwalkerHookStop, self).__init__()
         self._terminal = None
 
-    def init(self, terminal):
-        self._terminal = terminal
-
     @staticmethod
     def name():
         return '%s %s' % (VoidwalkerCommand.name(), 'hook-stop')

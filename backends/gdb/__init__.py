@@ -20,4 +20,6 @@ __all__ = ['target',
            'command',
            'platform',
            'convenience',
-           'hooks']
+           'hooks',
+
+           'tools']

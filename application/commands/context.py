@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from framework.interface.command import StackCommand
+from framework.interface.command import register_command
 from framework.platform.factory import PlatformFactory
 from framework.target.inferior import InferiorManager
 from framework.types.data import DataWidget
@@ -21,8 +23,6 @@ from framework.types.instructions import InstructionListingWidget
 from framework.ui.widgets import Section
 from framework.ui.widgets import Table
 from framework.ui.widgets import Widget
-from framework.interface.command import DataCommand
-from framework.interface.command import register_command
 
 from .voidwalker import VoidwalkerCommand
 
@@ -95,7 +95,7 @@ class ContextWidget(Widget):
 
 
 @register_command
-class ContextCommand(DataCommand):
+class ContextCommand(StackCommand):
     '''Show the current context.
 
 If the current thread of the inferior is valid the context will be recorded and

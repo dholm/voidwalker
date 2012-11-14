@@ -1,4 +1,4 @@
-# (void)walker application implementation
+# (void)walker GDB-specific interface
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,8 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['themes',
-           'cpus',
-           'parameters',
-           'commands',
-           'patching']
+from framework.interface.command import PrefixCommand
+from framework.interface.command import register_command
+
+from application.commands.voidwalker import VoidwalkerCommand
+
+
+@register_command
+class GdbCommand(PrefixCommand):
+    '''Commands for interacting with GDB'''
+
+    @staticmethod
+    def name():
+        return '%s %s' % (VoidwalkerCommand.name(), 'gdb')
+
+    def __init__(self):
+        super(GdbCommand, self).__init__()

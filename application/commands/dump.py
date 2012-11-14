@@ -34,14 +34,8 @@ class DumpCommand(PrefixCommand):
     def name():
         return '%s %s' % (VoidwalkerCommand.name(), 'dump')
 
-    def init(self, terminal):
-        pass
-
     def __init__(self):
         super(DumpCommand, self).__init__()
-
-    def invoke(self, argument, from_tty):
-        pass
 
 
 @register_command
@@ -54,9 +48,6 @@ data widget which displays it in hexadecimal and ascii form (when possible).'''
     @staticmethod
     def name():
         return '%s %s' % (DumpCommand.name(), 'data')
-
-    def init(self, terminal):
-        self._terminal = terminal
 
     def __init__(self):
         super(DumpDataCommand, self).__init__()
@@ -91,9 +82,6 @@ output.'''
     @staticmethod
     def name():
         return '%s %s' % (DumpCommand.name(), 'instructions')
-
-    def init(self, terminal):
-        self._terminal = terminal
 
     def __init__(self):
         super(DumpInstructionsCommand, self).__init__()

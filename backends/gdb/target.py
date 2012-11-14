@@ -89,6 +89,9 @@ class GdbInferior(Inferior):
     def read_memory(self, address, length):
         return self._gdb_inferior.read_memory(address, length)
 
+    def write_memory(self, buf, address):
+        self._gdb_inferior.write_memory(address, buf)
+
 
 @singleton_implementation(TargetFactory)
 class GdbTargetFactory(object):

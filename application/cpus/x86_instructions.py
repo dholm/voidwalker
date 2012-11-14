@@ -1,4 +1,4 @@
-# (void)walker application implementation
+# (void)walker x86 instructions
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['themes',
-           'cpus',
-           'parameters',
-           'commands',
-           'patching']
+from framework.patching.types import Instruction
+
+
+@Instruction.factory
+def nop(instruction):
+    instruction.byte(0x90)
