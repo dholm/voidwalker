@@ -24,14 +24,14 @@ from application.parameters.ui import ThemeParameter
 
 
 class SysTerminal(Terminal, object):
-    def _theme(self):
-        return ThemeManager().theme(ThemeParameter.get_value())
-
     def __init__(self):
         width = int(os.popen('tput cols').read().strip())
         height = int(os.popen('tput lines').read().strip())
         depth = int(os.popen('tput colors').read().strip())
         super(SysTerminal, self).__init__(width, height, depth)
+
+    def _theme(self):
+        return ThemeManager().theme(ThemeParameter.get_value())
 
     def theme(self):
         return self._theme()

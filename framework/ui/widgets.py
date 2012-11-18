@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
+import textwrap
+
 
 class Widget(object):
     def draw(self, terminal, width):
@@ -53,6 +56,8 @@ class Section(Widget):
 
 class Table(Widget):
     class Cell(Widget):
+        _format_exp = re.compile(r'(%\([^\s]+?\)s)')
+
         def __init__(self, contents=''):
             super(Table.Cell, self).__init__()
             self._contents = ''
@@ -62,12 +67,49 @@ class Table(Widget):
         def width(self, terminal):
             return terminal.string_width(self._contents)
 
+        def contents(self):
+            return self._contents
+
         def draw(self, terminal, width):
-            assert self.width(terminal) <= width
-            padding = ' ' * (width - self.width(terminal))
+            split = self._format_exp.split(self._contents)
+            contents = [[]]
+            width_left = width
+            last_format = ''
+            for item in split:
+                if self._format_exp.match(item):
+                    contents[-1].append(item)
+                    last_format = item
+
+                else:
+                    item_len = len(item.replace('%%', '%'))
+                    if item_len <= width_left:
+                        contents[-1].append(item)
+                        width_left -= item_len
+
+                    elif item_len < width:
+                        contents.append([last_format, item])
+                        width_left = width - item_len
+
+                    elif len(item[:width_left]):
+                        first = textwrap.wrap(item[:width_left], width_left)[0]
+                        contents[-1].append(first)
+                        rest = textwrap.wrap(item[len(first):], width)
+                        for line in rest:
+                            contents.append([last_format, line])
+                        width_left = width - len(contents[-1][-1])
+
+            contents = [''.join(x) for x in contents]
+            cell_content = ''
+            if len(contents):
+                cell_content = contents[0]
+
+            line_width = terminal.string_width(cell_content)
+            padding = ' ' * (width - line_width)
             terminal.write(('%(contents)s%(padding)s' %
-                            {'contents': self._contents,
+                            {'contents': cell_content,
                              'padding': padding}))
+
+            return ''.join(contents[1:])
 
     class Row(Widget):
         def __init__(self):
@@ -88,10 +130,24 @@ class Table(Widget):
 
         def draw(self, terminal, cell_widths):
             assert len(cell_widths) == len(self._cells)
-            assert self.width(terminal) <= sum(cell_widths)
 
+            cells_rest = []
             for i in range(len(self._cells)):
-                self._cells[i].draw(terminal, cell_widths[i])
+                rest = self._cells[i].draw(terminal, cell_widths[i])
+                if len(rest):
+                    cells_rest.append(rest)
+                else:
+                    cells_rest.append(None)
+
+            if cells_rest.count(None) < len(cells_rest):
+                row = Table.Row()
+                for content in cells_rest:
+                    if content is None:
+                        row.add_cell(Table.Cell(''))
+                    else:
+                        row.add_cell(Table.Cell(content))
+                return row
+            return None
 
     def _max_cell_width(self, terminal):
         max_width = 0
@@ -101,6 +157,7 @@ class Table(Widget):
 
     def __init__(self):
         self._rows = []
+        self._cols_per_row = 0
         self._cells = []
 
     def add_cell(self, cell):
@@ -109,6 +166,7 @@ class Table(Widget):
 
     def add_row(self, row):
         assert isinstance(row, Table.Row)
+        self._cols_per_row = max(len(row.cells()), self._cols_per_row)
         self._rows.append(row)
 
     def _draw_cells(self, terminal, width):
@@ -135,7 +193,52 @@ class Table(Widget):
                             row_padding_begin)
         terminal.write('%s\n' % (' ' * last_row_padding))
 
-    def _draw_rows(self, terminal, width):
+    def _cols_median(self, terminal):
+        cols_width = [[0 for i in range(len(self._rows))]
+                      for j in range(self._cols_per_row)]
+        for i in range(len(self._rows)):
+            row = self._rows[i]
+            for j in range(len(row.cells())):
+                cell = row.cells()[j]
+                cols_width[j][i] = cell.width(terminal)
+
+        cols_median = [0 for i in range(len(cols_width))]
+        for i in range(len(cols_width)):
+            lst = sorted(cols_width[i])
+            length = len(lst)
+            if not length % 2:
+                cols_median[i] = int((lst[length / 2] + lst[length / 2 - 1]) /
+                                     2)
+            else:
+                cols_median[i] = lst[length / 2]
+
+        return cols_median
+
+    def _cols_mean(self, terminal):
+        cols_width = [[0 for i in range(len(self._rows))]
+                      for j in range(self._cols_per_row)]
+        for i in range(len(self._rows)):
+            row = self._rows[i]
+            for j in range(len(row.cells())):
+                cell = row.cells()[j]
+                cols_width[j][i] = cell.width(terminal)
+
+        cols_mean = [0 for i in range(len(cols_width))]
+        for i in range(len(cols_width)):
+            cols_mean[i] = int(sum(cols_width[i]) / len(cols_width[i]))
+
+        return cols_mean
+
+    def _fill_widths(self, widths, wanted_widths, max_widths):
+        for i in range(len(max_widths)):
+            if widths[i] is not None:
+                continue
+            elif wanted_widths[i] <= max_widths[i]:
+                widths[i] = wanted_widths[i]
+
+        return widths
+
+    def _col_widths(self, terminal, width):
         cell_widths = []
         for row in self._rows:
             cells = len(row.cells())
@@ -145,11 +248,44 @@ class Table(Widget):
                 cell_widths[i] = max(cell_widths[i],
                                      row.cells()[i].width(terminal))
 
+        if width < sum(cell_widths):
+            adjusted_widths = [None] * len(cell_widths)
+
+            mean_widths = [(int(width / len(cell_widths)))] * len(cell_widths)
+            adjusted_widths = self._fill_widths(adjusted_widths, cell_widths,
+                                                mean_widths)
+            mean_widths = self._cols_mean(terminal)
+            median_widths = self._cols_median(terminal)
+            if adjusted_widths.count(None):
+                left_width = width - sum(filter(None, adjusted_widths))
+                max_cell_width = int(left_width / adjusted_widths.count(None))
+                max_widths = [min(max(mean_widths[i], median_widths[i]),
+                                  max_cell_width)
+                              for i in range(len(cell_widths))]
+                adjusted_widths = self._fill_widths(adjusted_widths,
+                                                    cell_widths, max_widths)
+
+            while adjusted_widths.count(None):
+                left_width = width - sum(filter(None, adjusted_widths))
+                max_cell_width = int(left_width / adjusted_widths.count(None))
+                current_min = min([cell_widths[i]
+                                   for i in range(len(cell_widths))
+                                   if adjusted_widths[i] is None])
+                index = cell_widths.index(current_min)
+                adjusted_widths[index] = max_cell_width
+
+            return adjusted_widths
+
+        return cell_widths
+
+    def _draw_rows(self, terminal, width):
+        cell_widths = self._col_widths(terminal, width)
         row_width = sum(cell_widths)
         for row in self._rows:
-            row.draw(terminal, cell_widths)
-            padding = ' ' * (width - row_width)
-            terminal.write('%s\n' % padding)
+            while row is not None:
+                row = row.draw(terminal, cell_widths)
+                padding = ' ' * (width - row_width)
+                terminal.write('%s\n' % padding)
 
     def draw(self, terminal, width):
         if self._rows:

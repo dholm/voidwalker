@@ -24,9 +24,6 @@ from application.parameters.ui import ThemeParameter
 
 
 class GdbTerminal(Terminal):
-    def _theme(self):
-        return ThemeManager().theme(ThemeParameter.get_value())
-
     def _get_depth(self):
         tf = tempfile.NamedTemporaryFile(delete=True)
         gdb.execute('shell tput colors >%s' % tf.name, False, True)
@@ -41,6 +38,9 @@ class GdbTerminal(Terminal):
         height = gdb.parameter('height')
         depth = self._get_depth()
         super(GdbTerminal, self).__init__(width, height, depth)
+
+    def _theme(self):
+        return ThemeManager().theme(ThemeParameter.get_value())
 
     def write(self, string, dictionary=None):
         gdb.write(self._theme().write(string, dictionary))

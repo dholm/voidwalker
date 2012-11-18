@@ -44,8 +44,9 @@ class GdbParameterFactory(object):
     def create_parameter(self, parameter_type):
         if issubclass(parameter_type, EnumParameter):
             class GdbParameterEnum(GdbBaseParameter, parameter_type):
-                show_doc = parameter_type.__doc__
-                set_doc = parameter_type.__doc__
+                __doc__ = parameter_type.__doc__
+                show_doc = __doc__
+                set_doc = __doc__
 
                 def __init__(self):
                     parameter_type.__init__(self)
@@ -60,8 +61,9 @@ class GdbParameterFactory(object):
 
         elif issubclass(parameter_type, IntegerParameter):
             class GdbParameterInteger(GdbBaseParameter, parameter_type):
-                show_doc = parameter_type.__doc__
-                set_doc = parameter_type.__doc__
+                __doc__ = parameter_type.__doc__
+                show_doc = __doc__
+                set_doc = __doc__
 
                 def __init__(self):
                     parameter_type.__init__(self)
@@ -75,8 +77,9 @@ class GdbParameterFactory(object):
 
         elif issubclass(parameter_type, BooleanParameter):
             class GdbParameterBoolean(GdbBaseParameter, parameter_type):
-                show_doc = parameter_type.__doc__
-                set_doc = parameter_type.__doc__
+                __doc__ = parameter_type.__doc__
+                show_doc = __doc__
+                set_doc = __doc__
 
                 def __init__(self):
                     parameter_type.__init__(self)
@@ -91,6 +94,8 @@ class GdbParameterFactory(object):
         elif (issubclass(parameter_type, Parameter) or
               issubclass(parameter_type, PrefixParameter)):
             class GdbParameter(parameter_type):
+                __doc__ = parameter_type.__doc__
+
                 def __init__(self):
                     parameter_type.__init__(self)
 

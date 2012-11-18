@@ -92,6 +92,20 @@ class WidgetsTest(TestCase):
 
         table.draw(self._terminal, self._terminal.width() / 2)
 
+    def test_table_row_multiline_cell(self):
+        row = Table.Row()
+        cells = [Table.Cell('First col'),
+                 Table.Cell('this cell should span multiple lines'),
+                 Table.Cell('Third col')]
+        for cell in cells:
+            row.add_cell(cell)
+        row_len = (sum(x.width(self._terminal) for x in cells) -
+                   (cells[1].width(self._terminal) / 2))
+
+        table = Table()
+        table.add_row(row)
+        table.draw(self._terminal, row_len)
+
     def test_tables_rows(self):
         table = Table()
         for i in range(0, 5):
@@ -117,3 +131,18 @@ class WidgetsTest(TestCase):
             table.add_cell(cell)
 
         table.draw(self._terminal, self._terminal.width() / 2)
+
+    def test_table_rows_varying_cells(self):
+        data = [['col 1', 'col 2', 'col 3'],
+                ['xxYYxxYYxx', '-', ''],
+                ['', '-', 'xxYYxxYY']]
+
+        table = Table()
+        for r in data:
+            row = Table.Row()
+            for c in r:
+                row.add_cell(Table.Cell(c))
+
+            table.add_row(row)
+
+        table.draw(self._terminal, self._terminal.width())

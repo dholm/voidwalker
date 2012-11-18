@@ -6,6 +6,8 @@ software on an instruction level. It is heavily influenced by the
 et al. but opens up for a much more advanced solution by using Python instead
 of GDB commands.
 
+![(void)walker session](https://github.com/dholm/voidwalker/raw/master/screenshot.png)
+
 
 ## Requirements
 
