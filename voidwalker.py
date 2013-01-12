@@ -50,19 +50,24 @@ from application.patching import SnippetCommandBuilder
 
 version = '0.0.0'
 
-config = Configuration()
-ParameterBuilder(GdbParameterFactory(), config)
 
-snippet_repository = SnippetRepository()
-SnippetCommandBuilder(snippet_repository)
+class VoidWalkerBuilder(object):
+    def __init__(self):
+        config = Configuration()
+        ParameterBuilder(GdbParameterFactory(), config)
 
-platform_factory = GdbPlatformFactory()
-target_factory = GdbTargetFactory(CpuFactory(platform_factory))
-inferior_repository = InferiorRepository(target_factory)
-ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
-CommandBuilder(GdbCommandFactory(), inferior_repository, platform_factory,
-               target_factory, config, ansi_terminal)
+        snippet_repository = SnippetRepository()
+        SnippetCommandBuilder(snippet_repository)
 
-ansi_terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
-                     'v%(version)s installed\n'),
-                    {'version': version})
+        platform_factory = GdbPlatformFactory()
+        target_factory = GdbTargetFactory(CpuFactory(platform_factory))
+        inferior_repository = InferiorRepository(target_factory)
+        ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
+        CommandBuilder(GdbCommandFactory(), inferior_repository, platform_factory,
+                       target_factory, config, ansi_terminal)
+
+        ansi_terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
+                             'v%(version)s installed\n'),
+                            {'version': version})
+
+void_walker_builder = VoidWalkerBuilder()
