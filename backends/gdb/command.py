@@ -62,95 +62,106 @@ def parse_argument_list(argument):
 
 
 class GdbCommandFactory(CommandFactory, object):
-    def create(self, command_type):
-        if issubclass(command_type, DataCommand):
-            class GdbDataCommand(gdb.Command, command_type):
-                __doc__ = command_type.__doc__
+    def create_data_command(self, command_type, terminal):
+        class GdbDataCommand(gdb.Command, command_type):
+            __doc__ = command_type.__doc__
 
-                def __init__(self):
-                    command_type.__init__(self)
-                    gdb.Command.__init__(self, command_type.name(),
-                                         gdb.COMMAND_DATA, gdb.COMPLETE_NONE)
+            def __init__(self):
+                command_type.__init__(self)
+                gdb.Command.__init__(self, command_type.name(),
+                                     gdb.COMMAND_DATA, gdb.COMPLETE_NONE)
 
-                def invoke(self, argument, from_tty):
-                    thread = get_current_thread(self._inferior_repository,
-                                                self._target_factory)
-                    if thread is not None:
-                        args = parse_argument_list(argument)
-                        command_type.invoke(self, thread, args, from_tty)
+            def invoke(self, argument, _):
+                thread = get_current_thread()
+                if thread is not None:
+                    args = parse_argument_list(argument)
+                    command_type.execute(self, terminal, thread, args)
 
-            return GdbDataCommand()
+        return GdbDataCommand()
 
-        if issubclass(command_type, StackCommand):
-            class GdbStackCommand(gdb.Command, command_type):
-                __doc__ = command_type.__doc__
+    def create_stack_command(self, command_type, terminal):
+        class GdbStackCommand(gdb.Command, command_type):
+            __doc__ = command_type.__doc__
 
-                def __init__(self):
-                    command_type.__init__(self)
-                    gdb.Command.__init__(self, command_type.name(),
-                                         gdb.COMMAND_STACK, gdb.COMPLETE_NONE)
+            def __init__(self):
+                command_type.__init__(self)
+                gdb.Command.__init__(self, command_type.name(),
+                                     gdb.COMMAND_STACK, gdb.COMPLETE_NONE)
 
-                def invoke(self, argument, from_tty):
-                    thread = get_current_thread(self._inferior_repository,
-                                                self._target_factory)
-                    if thread is not None:
-                        args = parse_argument_list(argument)
-                        command_type.invoke(self, thread, args, from_tty)
+            def invoke(self, argument, _):
+                thread = get_current_thread()
+                if thread is not None:
+                    args = parse_argument_list(argument)
+                    command_type.execute(self, terminal, thread, args)
 
-            return GdbStackCommand()
+        return GdbStackCommand()
 
-        if issubclass(command_type, PrefixCommand):
-            class GdbPrefixCommand(gdb.Command, command_type):
-                __doc__ = command_type.__doc__
+    def create_prefix_command(self, command_type, _):
+        class GdbPrefixCommand(gdb.Command, command_type):
+            __doc__ = command_type.__doc__
 
-                def __init__(self):
-                    command_type.__init__(self)
-                    gdb.Command.__init__(self, command_type.name(),
-                                         gdb.COMMAND_USER,
-                                         gdb.COMPLETE_COMMAND, True)
-                    self._terminal = None
+            def __init__(self):
+                command_type.__init__(self)
+                gdb.Command.__init__(self, command_type.name(),
+                                     gdb.COMMAND_USER,
+                                     gdb.COMPLETE_COMMAND, True)
 
-            return GdbPrefixCommand()
+        return GdbPrefixCommand()
 
-        if issubclass(command_type, SupportCommand):
-            class GdbSupportCommand(gdb.Command, command_type):
-                __doc__ = command_type.__doc__
+    def create_support_command(self, command_type, terminal):
+        class GdbSupportCommand(gdb.Command, command_type):
+            __doc__ = command_type.__doc__
 
-                def __init__(self):
-                    command_type.__init__(self)
-                    gdb.Command.__init__(self, command_type.name(),
-                                         gdb.COMMAND_SUPPORT,
-                                         gdb.COMPLETE_NONE, True)
+            def __init__(self):
+                command_type.__init__(self)
+                gdb.Command.__init__(self, command_type.name(),
+                                     gdb.COMMAND_SUPPORT,
+                                     gdb.COMPLETE_NONE, True)
 
-            return GdbSupportCommand()
+            def invoke(self, argument, _):
+                args = parse_argument_list(argument)
+                command_type.execute(self, terminal, args)
 
-        if issubclass(command_type, BreakpointCommand):
-            class GdbBreakpointCommand(gdb.Command, command_type):
-                def __init__(self):
-                    gdb.Command.__init__(self, command_type.name(),
-                                         gdb.COMMAND_BREAKPOINTS,
-                                         gdb.COMPLETE_NONE)
+        return GdbSupportCommand()
 
-                def invoke(self, argument, from_tty):
-                    inferior = get_current_inferior(self._inferior_repository)
-                    if inferior is not None:
-                        args = parse_argument_list(argument)
-                        command_type.invoke(self, inferior, args, from_tty)
+    def create_breakpoint_command(self, command_type, terminal):
+        class GdbBreakpointCommand(gdb.Command, command_type):
+            def __init__(self):
+                command_type.__init__(self)
+                gdb.Command.__init__(self, command_type.name(),
+                                     gdb.COMMAND_BREAKPOINTS,
+                                     gdb.COMPLETE_NONE)
 
-            return GdbBreakpointCommand()
+            def invoke(self, argument, _):
+                inferior = get_current_inferior()
+                if inferior is not None:
+                    args = parse_argument_list(argument)
+                    command_type.execute(self, terminal, inferior, args)
 
-        if issubclass(command_type, Command):
-            class GdbCommand(gdb.Command, command_type):
-                __doc__ = command_type.__doc__
+        return GdbBreakpointCommand()
 
-                def __init__(self):
-                    command_type.__init__(self)
-                    gdb.Command.__init__(self, command_type.name(),
-                                         gdb.COMMAND_USER,
-                                         gdb.COMPLETE_COMMAND)
+    def create_generic_command(self, command_type, _):
+        class GdbCommand(gdb.Command, command_type):
+            __doc__ = command_type.__doc__
 
-            return GdbCommand()
+            def __init__(self):
+                command_type.__init__(self)
+                gdb.Command.__init__(self, command_type.name(),
+                                     gdb.COMMAND_USER,
+                                     gdb.COMPLETE_COMMAND)
 
+        return GdbCommand()
+
+    def create(self, command_type, terminal):
+        create_method = [(DataCommand, self.create_data_command),
+                         (StackCommand, self.create_stack_command),
+                         (PrefixCommand, self.create_prefix_command),
+                         (SupportCommand, self.create_support_command),
+                         (BreakpointCommand, self.create_breakpoint_command),
+                         (Command, self.create_generic_command)]
+        for ctype, create in create_method:
+            if issubclass(command_type, ctype):
+                return create(command_type, terminal)
         else:
-            raise TypeError('Command type %s unknown!' %
-                            str(command_type))
+            raise TypeError('Command %s of type %s unknown!' %
+                            (command_type.name(), repr(command_type)))

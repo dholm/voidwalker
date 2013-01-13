@@ -36,7 +36,7 @@ class TestCommandFactory(CommandFactory, object):
 
                 def invoke(self, argument, _):
                     inferior = TestInferior()
-                    command_type.invoke(self, inferior, argument)
+                    command_type.execute(self, terminal, inferior, argument)
 
             return TestDataCommand()
 
@@ -59,7 +59,7 @@ class TestCommandFactory(CommandFactory, object):
 
 
 class TestParameterFactory(ParameterFactory, object):
-    def create_parameter(self, parameter_type):
+    def create(self, parameter_type):
         if issubclass(parameter_type, EnumParameter):
             class TestParameterEnum(parameter_type):
                 def __init__(self):

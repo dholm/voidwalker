@@ -1,5 +1,5 @@
-# (void)walker configuration parameters
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# (void)walker system backend
+# Copyright (C) 2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .voidwalker import VoidwalkerParameter
-from .show import ShowParameter
-from .context import ContextParameter
-from .context import ContextStackParameter
-from .context import ContextInstructionsParameter
-
+__all__ = ['event']

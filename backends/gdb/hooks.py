@@ -80,6 +80,7 @@ to your ~/.gdbinit:
     def name():
         return '%s %s' % (VoidwalkerCommand.name(), 'hook-stop')
 
-    def invoke(self, inferior, argument):
-        if ContextHookParameter.get_value():
+    def execute(self, config, *_):
+        context_hook_name = ContextHookParameter.name()
+        if config.parameter(context_hook_name).value():
             gdb.execute(ContextCommand.name())

@@ -64,8 +64,8 @@ class CommandTest(TestCase):
                               platform_factory, target_factory,
                               Configuration(), self._terminal)
 
-        self.assertIsNotNone(bldr.command(TestCommand.name()))
-        self.assertIsNotNone(bldr.command(TestDataCommand.name()))
+        self.assertIn(TestCommand.name(), bldr.commands)
+        self.assertIn(TestDataCommand.name(), bldr.commands)
 
 
 @register_parameter
@@ -132,3 +132,4 @@ class ParameterTest(TestCase):
     def test_enum_parameter(self):
         name = EnumParameterTest.name()
         self.assertIsNotNone(self._config.parameter(name))
+

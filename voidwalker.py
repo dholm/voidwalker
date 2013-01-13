@@ -48,13 +48,15 @@ from backends.gdb import GdbTerminal
 
 from application.patching import SnippetCommandBuilder
 
-version = '0.0.0'
+from version import __version__
 
 
-class VoidWalkerBuilder(object):
-    def __init__(self):
+class VoidwalkerBuilder(object):
+    def __init__(self, version):
+        event_queue = GdbEventQueue()
+
         config = Configuration()
-        ParameterBuilder(GdbParameterFactory(), config)
+        ParameterBuilder(config, GdbParameterFactory())
 
         snippet_repository = SnippetRepository()
         SnippetCommandBuilder(snippet_repository)
@@ -70,4 +72,5 @@ class VoidWalkerBuilder(object):
                              'v%(version)s installed\n'),
                             {'version': version})
 
-void_walker_builder = VoidWalkerBuilder()
+
+voidwalker_builder = VoidwalkerBuilder(__version__)

@@ -109,9 +109,8 @@ parameters'''
 
     def __init__(self):
         super(ContextCommand, self).__init__()
-        self._terminal = None
 
-    def invoke(self, thread, argument, from_tty=False):
+    def execute(self, terminal, thread, argument):
         if not thread.is_valid():
             return
 
@@ -122,8 +121,5 @@ parameters'''
         if len(thread.contexts()):
             previous_context = thread.contexts()[-1]
 
-        if not from_tty:
-            thread.contexts().append(context)
-
         context_widget = ContextWidget(previous_context, context)
-        context_widget.draw(self._terminal, self._terminal.width())
+        context_widget.draw(terminal, terminal.width())

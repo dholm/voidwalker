@@ -51,12 +51,11 @@ data widget which displays it in hexadecimal and ascii form (when possible).'''
 
     def __init__(self):
         super(DumpDataCommand, self).__init__()
-        self._terminal = None
 
-    def invoke(self, thread, arguments, from_tty=False):
+    def execute(self, terminal, thread, arguments):
         if len(arguments) != 2:
-            self._terminal.write(('%(face-error)sError:'
-                                  '%(face-normal)s invalid arguments!\n'))
+            terminal.write(('%(face-error)sError:'
+                            '%(face-normal)s invalid arguments!\n'))
             return
 
         address = abs(long(arguments[0]))
@@ -68,7 +67,7 @@ data widget which displays it in hexadecimal and ascii form (when possible).'''
 
         section = Section('0x%016lX' % address)
         section.add_component(DataWidget(data_chunk))
-        section.draw(self._terminal, self._terminal.width())
+        section.draw(terminal, terminal.width())
 
 
 @register_command
@@ -85,12 +84,11 @@ output.'''
 
     def __init__(self):
         super(DumpInstructionsCommand, self).__init__()
-        self._terminal = None
 
-    def invoke(self, thread, arguments, from_tty=False):
+    def execute(self, terminal, thread, arguments):
         if len(arguments) != 2:
-            self._terminal.write(('%(face-error)sError:'
-                                  '%(face-normal)s invalid arguments!\n'))
+            terminal.write(('%(face-error)sError:'
+                            '%(face-normal)s invalid arguments!\n'))
             return
 
         address = abs(long(arguments[0]))
@@ -101,4 +99,4 @@ output.'''
 
         section = Section('0x%016lX' % address)
         section.add_component(InstructionListingWidget(listing))
-        section.draw(self._terminal, self._terminal.width())
+        section.draw(terminal, terminal.width())
