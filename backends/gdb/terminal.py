@@ -17,10 +17,7 @@
 import gdb
 import tempfile
 
-from framework.ui.terminal import Terminal
-from framework.ui.theme import ThemeManager
-
-from application.parameters.ui import ThemeParameter
+from flowui import Terminal
 
 
 class GdbTerminal(Terminal):
@@ -33,14 +30,16 @@ class GdbTerminal(Terminal):
         except ValueError:
             return Terminal.DEFAULT_DEPTH
 
+    def reset(self):
+        pass
+
     def __init__(self):
         width = gdb.parameter('width')
         height = gdb.parameter('height')
         depth = self._get_depth()
         super(GdbTerminal, self).__init__(width, height, depth)
 
-    def _theme(self):
-        return ThemeManager().theme(ThemeParameter.get_value())
-
     def write(self, string, dictionary=None):
-        gdb.write(self._theme().write(string, dictionary))
+        if dictionary is not None:
+            string = string.format(dictionary)
+        gdb.write(string)

@@ -15,6 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from array import array
+from flowui.terminal import AnsiTerminal
+from flowui.terminals import SysTerminal
+from flowui.themes import Solarized
 from unittest import TestCase
 
 from framework.types.data import DataChunk
@@ -22,8 +25,6 @@ from framework.types.data import DataWidget
 from framework.types.instructions import Instruction
 from framework.types.instructions import InstructionListing
 from framework.types.instructions import InstructionListingWidget
-
-from backends.test.terminal import SysTerminal
 
 
 class WidgetsTest(TestCase):
@@ -36,7 +37,7 @@ class WidgetsTest(TestCase):
         widget.draw(self._terminal, self._terminal.DEFAULT_WIDTH)
 
     def setUp(self):
-        self._terminal = SysTerminal()
+        self._terminal = AnsiTerminal(SysTerminal(), Solarized())
 
     def test_datachunk(self):
         address = 0xf00fba11
@@ -69,7 +70,7 @@ class WidgetsTest(TestCase):
                                                                '\x02']),
                                                    'add', '$0x2,%%eax',
                                                    '<main+20>'))
-        long_symbol_name = ['x' for x in range(self._terminal.DEFAULT_WIDTH)]
+        long_symbol_name = ['x' for _ in range(self._terminal.DEFAULT_WIDTH)]
         listing.add_instruction(0xed7, Instruction(array('c', ['\x48', '\x89',
                                                                '\xc7']),
                                                    'mov', '%%rax,%%rdi',

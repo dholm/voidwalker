@@ -21,10 +21,7 @@ import unittest
 
 from framework.interface.parameter import ParameterFactory
 from framework.interface.parameter import ParameterManager
-from framework.ui.theme import ThemeManager
 from framework.utils.decorators import singleton_implementation
-
-from backends.test.terminal import SysTerminal
 
 import tests
 
@@ -37,8 +34,6 @@ class TestParameterFactory(object):
         return parameter
 
 ParameterManager().init()
-terminal = SysTerminal()
-ThemeManager().init(terminal.depth())
 
 suite = tests.suite()
 runner = unittest.TextTestRunner(verbosity=2)

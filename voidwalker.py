@@ -17,6 +17,10 @@
 import inspect
 import os.path
 import sys
+
+from flowui.terminal import AnsiTerminal
+from flowui.themes import Solarized
+
 voidwalker_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 sys.path.append(os.path.dirname(voidwalker_path))
 
@@ -35,18 +39,16 @@ from backends.gdb.terminal import GdbTerminal
 from framework.interface.command import CommandManager
 from framework.interface.parameter import ParameterManager
 from framework.target.inferior import InferiorManager
-from framework.ui.theme import ThemeManager
 
 
 version = '0.0.0'
 
 ParameterManager().init()
-terminal = GdbTerminal()
-ThemeManager().init(terminal.depth())
-CommandManager().init(terminal)
+ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
+CommandManager().init(ansi_terminal)
 InferiorManager().init()
 ConvenienceManager().init()
 
-terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
-                'v%(version)s installed%(face-reset)s\n'),
-               {'version': version})
+ansi_terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
+                     'v%(version)s installed\n'),
+                    {'version': version})

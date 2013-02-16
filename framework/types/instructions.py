@@ -14,11 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 import re
 
-from ..ui.widgets import Table
-from ..ui.widgets import Widget
+from collections import OrderedDict
+from flowui import Widget
+from flowui.widgets.table import Cell
+from flowui.widgets.table import Row
+from flowui.widgets.table import Table
 
 
 class Instruction(object):
@@ -95,33 +97,32 @@ class InstructionListingWidget(Widget):
     def draw(self, terminal, width):
         table = Table()
         for address, instruction in self._instruction_listing.instructions():
-            row = Table.Row()
+            row = Row()
 
             const_face = '%(face-normal)s'
             if address == self._program_counter:
                 const_face = '%(face-underlined)s'
-            row.add_cell(Table.Cell('%s0x%016lX:' % (const_face, address)))
+            row.add_cell(Cell('%s0x%016lX:' % (const_face, address)))
 
             if instruction.symbol() is not None:
                 identifier = ['%(face-identifier)s', instruction.symbol(), ':']
-                row.add_cell(Table.Cell(''.join(identifier)))
+                row.add_cell(Cell(''.join(identifier)))
             else:
-                row.add_cell(Table.Cell())
+                row.add_cell(Cell())
 
             hex_string = [('%02X' % ord(i))
                           for i in instruction.opcode()
                           if i is not None]
-            row.add_cell(Table.Cell('%s%s' % (const_face,
-                                              ' '.join(hex_string))))
+            row.add_cell(Cell('%s%s' % (const_face, ' '.join(hex_string))))
 
-            row.add_cell(Table.Cell('%s%s' % ('%(face-statement)s',
-                                              instruction.mnemonic())))
+            row.add_cell(Cell('%s%s' % ('%(face-statement)s',
+                                        instruction.mnemonic())))
 
             if instruction.operands() is not None:
                 operands = self._fmt_operands(instruction.operands())
-                row.add_cell(Table.Cell(operands))
+                row.add_cell(Cell(operands))
             else:
-                row.add_cell(Table.Cell())
+                row.add_cell(Cell())
 
             table.add_row(row)
 

@@ -14,6 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from flowui.widgets import Section
+from flowui.widgets.table import Cell
+from flowui.widgets.table import Row
+from flowui.widgets.table import Table
+
 from framework.interface.command import PrefixCommand
 from framework.interface.command import StackCommand
 from framework.interface.command import SupportCommand
@@ -21,8 +26,6 @@ from framework.interface.command import register_command
 from framework.patching.snippet import SnippetManager
 from framework.platform.cpu import Architecture
 from framework.target.inferior import InferiorManager
-from framework.ui.widgets import Section
-from framework.ui.widgets import Table
 
 from ..commands.voidwalker import VoidwalkerCommand
 
@@ -62,13 +65,13 @@ class ListSnippetsCommand(SupportCommand):
     def __init__(self):
         super(ListSnippetsCommand, self).__init__()
 
-    def invoke(self, arguments, from_tty):
+    def invoke(self, _, from_tty=False):
         table = Table()
         for name, snippet in SnippetManager().snippets():
-            row = Table.Row()
-            row.add_cell(Table.Cell('%s%s' % ('%(face-identifier)s', name)))
-            row.add_cell(Table.Cell('%s%s' % ('%(face-comment)s',
-                                              snippet.description())))
+            row = Row()
+            row.add_cell(Cell('%s%s' % ('%(face-identifier)s', name)))
+            row.add_cell(Cell('%s%s' % ('%(face-comment)s',
+                                        snippet.description())))
             table.add_row(row)
 
         section = Section('snippets')
@@ -91,7 +94,7 @@ touched by this command.'''
     def __init__(self):
         super(ApplySnippetCommand, self).__init__()
 
-    def invoke(self, thread, arguments, from_tty):
+    def invoke(self, thread, arguments, from_tty=False):
         if len(arguments) < 2:
             self._terminal.write('%(face-error)sWrong number of arguments!\n')
             return
@@ -117,6 +120,8 @@ touched by this command.'''
         address = abs(long(arguments[1]))
         code = implementation.assemble()
         inferior.write_memory(code, address)
+
         self._terminal.write('Applied snippet %s%s%s at %s0x%x\n' %
                              ('%(face-identifier)s', arguments[0],
-                              '%(face-normal)s', '%(face-constant)s', address))
+                              '%(face-normal)s', '%(face-constant)s',
+                              address))

@@ -11,7 +11,8 @@ of GDB commands.
 
 ## Requirements
 
-GDB 7.5 or later built with support for Python extensions.
+ * GDB 7.5 or later built with support for Python extensions.
+ * FlowUI 0.2.1 or later.
 
 Currently (void)walker has support for the following architectures, but adding
 new ones should be fairly easy at this point.
@@ -22,6 +23,10 @@ new ones should be fairly easy at this point.
 
 
 ## Installation
+
+Install the requirements using pip:
+
+    pip install -r requirements.txt
 
 Put (void)walker somewhere on your system and simply add the following line to
 your *~/.gdbinit*:

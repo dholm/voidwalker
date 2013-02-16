@@ -21,7 +21,6 @@ import tests.patching
 import tests.platform
 import tests.target
 import tests.types
-import tests.ui
 
 
 def suite():
@@ -32,5 +31,4 @@ def suite():
     test_suite.addTests(loader.loadTestsFromModule(tests.platform))
     test_suite.addTests(loader.loadTestsFromModule(tests.target))
     test_suite.addTests(loader.loadTestsFromModule(tests.types))
-    test_suite.addTests(loader.loadTestsFromModule(tests.ui))
     return test_suite

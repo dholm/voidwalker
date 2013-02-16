@@ -16,8 +16,11 @@
 
 import string
 
-from ..ui.widgets import Table
-from ..ui.widgets import Widget
+from flowui import Widget
+from flowui.widgets.table import Cell
+from flowui.widgets.table import Row
+from flowui.widgets.table import Table
+
 from ..utils.recipes import grouper
 
 
@@ -69,10 +72,10 @@ class DataWidget(Widget):
                 hex_string += ['  ']
                 ascii_string += ['  ']
 
-            row = Table.Row()
-            row.add_cell(Table.Cell('0x%016X:' % address))
-            row.add_cell(Table.Cell(''.join(hex_string)))
-            row.add_cell(Table.Cell(''.join(ascii_string)))
+            row = Row()
+            row.add_cell(Cell('0x%016X:' % address))
+            row.add_cell(Cell(''.join(hex_string)))
+            row.add_cell(Cell(''.join(ascii_string)))
             table.add_row(row)
 
             address += line_len

@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from flowui.terminal import AnsiTerminal
+from flowui.terminals import SysTerminal
+from flowui.themes import Solarized
 from unittest import TestCase
 
 from framework.interface.command import CommandManager
@@ -25,12 +28,11 @@ from framework.interface.parameter import register_parameter
 
 from backends.test.interface import TestCommand
 from backends.test.interface import TestDataCommand
-from backends.test.terminal import SysTerminal
 
 
 class CommandTest(TestCase):
     def setUp(self):
-        self._terminal = SysTerminal()
+        self._terminal = AnsiTerminal(SysTerminal(), Solarized())
 
     def test_command(self):
         CommandManager().init(self._terminal)

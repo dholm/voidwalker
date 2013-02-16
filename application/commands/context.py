@@ -14,15 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from flowui import Widget
+from flowui.widgets import Section
+from flowui.widgets.table import Cell
+from flowui.widgets.table import Table
+
 from framework.interface.command import StackCommand
 from framework.interface.command import register_command
 from framework.platform.factory import PlatformFactory
 from framework.target.inferior import InferiorManager
 from framework.types.data import DataWidget
 from framework.types.instructions import InstructionListingWidget
-from framework.ui.widgets import Section
-from framework.ui.widgets import Table
-from framework.ui.widgets import Widget
 
 from .voidwalker import VoidwalkerCommand
 
@@ -35,7 +37,7 @@ class ContextWidget(Widget):
 
     def _create_registers_section(self, previous_context, context):
         registers_section = Section('registers')
-        for group, register_dict in context.registers():
+        for _, register_dict in context.registers():
             reg_size = 0
             for name in register_dict.iterkeys():
                 reg_size = max(reg_size, len(name))
@@ -58,7 +60,7 @@ class ContextWidget(Widget):
                                   (' %(register)s ' %
                                    {'register': register.str()}))]
 
-                cell = Table.Cell(''.join(contents))
+                cell = Cell(''.join(contents))
                 table.add_cell(cell)
 
             registers_section.add_component(table)

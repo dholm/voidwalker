@@ -23,13 +23,14 @@ from ..utils.decorators import singleton_specification
 class Command(object):
     def __init__(self):
         self._terminal = None
+        self._theme = None
 
     def init(self, terminal):
         self._terminal = terminal
 
 
 class PrefixCommand(Command):
-    def invoke(self, argument, from_tty):
+    def invoke(self, *_):
         self._terminal.write('%(face-error)sAttempting to invoke an '
                              'incomplete command!\n')
 

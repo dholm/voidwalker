@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from flowui.widgets import Section
+
 from framework.interface.command import DataCommand
 from framework.interface.command import PrefixCommand
 from framework.interface.command import register_command
@@ -21,7 +23,6 @@ from framework.target.inferior import InferiorManager
 from framework.types.data import DataChunk
 from framework.types.data import DataWidget
 from framework.types.instructions import InstructionListingWidget
-from framework.ui.widgets import Section
 
 from .voidwalker import VoidwalkerCommand
 
