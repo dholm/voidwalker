@@ -19,10 +19,14 @@ import abc
 
 class Command(object):
     def __init__(self):
+        self._inferior_repository = None
+        self._target_factory = None
         self._config = None
         self._terminal = None
 
-    def init(self, config, terminal):
+    def init(self, inferior_repository, target_factory, config, terminal):
+        self._inferior_repository = inferior_repository
+        self._target_factory = target_factory
         self._config = config
         self._terminal = terminal
 
@@ -72,16 +76,18 @@ class CommandFactory(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def create_command(self, command_type):
+    def create(self, command_type):
         raise NotImplementedError
 
 
 class CommandBuilder(object):
-    def __init__(self, factory, config, terminal):
+    def __init__(self, command_factory, inferior_repository, target_factory,
+                 config, terminal):
         self._commands = {}
         for Cmd in _command_list:
-            self._commands[Cmd.name()] = factory.create_command(Cmd)
-            self._commands[Cmd.name()].init(config, terminal)
+            self._commands[Cmd.name()] = command_factory.create(Cmd)
+            self._commands[Cmd.name()].init(inferior_repository,
+                                            target_factory, config, terminal)
 
     def command(self, name):
         assert name in self._commands

@@ -24,7 +24,6 @@ from framework.target.inferior import Inferior
 from framework.target.thread import Thread
 from framework.types.instructions import Instruction
 from framework.types.instructions import InstructionListing
-from framework.utils import singleton_implementation
 
 
 class GdbThread(Thread):
@@ -92,18 +91,14 @@ class GdbInferior(Inferior):
         self._gdb_inferior.write_memory(address, buf)
 
 
-@singleton_implementation(TargetFactory)
-class GdbTargetFactory(object):
+class GdbTargetFactory(TargetFactory, object):
     _file_expression = re.compile((r'`(?P<path>[^\']+)\', '
                                    r'file type (?P<target>\S+).'))
     _inferior_expression = re.compile((r'(?P<num>\d+)\s+'
                                        r'(?P<description>\S+ \S*)\s+'
                                        r'(?P<path>.+)$'))
 
-    def __init__(self):
-        self._cpu_factory = None
-
-    def init(self, cpu_factory):
+    def __init__(self, cpu_factory):
         self._cpu_factory = cpu_factory
 
     @staticmethod

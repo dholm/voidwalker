@@ -16,16 +16,9 @@
 
 import abc
 
-from ..utils import singleton_specification
 
-
-@singleton_specification
 class TargetFactory(object):
     __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def init(self, cpu_factory):
-        raise NotImplementedError
 
     @abc.abstractmethod
     def create_inferior(self, inferior_id):

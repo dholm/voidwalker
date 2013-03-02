@@ -19,19 +19,22 @@ from flowui.terminals import SysTerminal
 from flowui.themes import Solarized
 from unittest import TestCase
 
-from framework.interface.command import Command
-from framework.interface.command import CommandBuilder
-from framework.interface.command import DataCommand
-from framework.interface.command import register_command
-from framework.interface.config import Configuration
-from framework.interface.parameter import BooleanParameter
-from framework.interface.parameter import EnumParameter
-from framework.interface.parameter import Parameter
-from framework.interface.parameter import ParameterBuilder
-from framework.interface.parameter import register_parameter
+from framework.interface import BooleanParameter
+from framework.interface import Command
+from framework.interface import CommandBuilder
+from framework.interface import Configuration
+from framework.interface import DataCommand
+from framework.interface import EnumParameter
+from framework.interface import Parameter
+from framework.interface import ParameterBuilder
+from framework.interface import register_command
+from framework.interface import register_parameter
+from framework.platform import CpuFactory
+from framework.target import InferiorRepository
 
-from backends.test.interface import TestCommandFactory
-from backends.test.interface import TestParameterFactory
+from backends.test import TestCommandFactory
+from backends.test import TestParameterFactory
+from backends.test import TestTargetFactory
 
 
 @register_command
@@ -53,8 +56,10 @@ class CommandTest(TestCase):
         self._terminal = AnsiTerminal(SysTerminal(), Solarized())
 
     def test_command(self):
-        bldr = CommandBuilder(TestCommandFactory(), Configuration(),
-                              self._terminal)
+        target_factory = TestTargetFactory(CpuFactory())
+        inferior_repository = InferiorRepository(target_factory)
+        bldr = CommandBuilder(TestCommandFactory(), inferior_repository,
+                              target_factory, Configuration(), self._terminal)
 
         self.assertIsNotNone(bldr.command(TestCommand.name()))
         self.assertIsNotNone(bldr.command(TestDataCommand.name()))

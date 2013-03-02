@@ -16,9 +16,6 @@
 
 import abc
 
-from ..utils import singleton
-from .factory import TargetFactory
-
 
 class Inferior(object):
     __metaclass__ = abc.ABCMeta
@@ -57,12 +54,9 @@ class Inferior(object):
         raise NotImplementedError
 
 
-@singleton
-class InferiorManager(object):
-    def init(self):
-        pass
-
-    def __init__(self):
+class InferiorRepository(object):
+    def __init__(self, target_factory):
+        self._target_factory = target_factory
         self._inferiors = {}
 
     def add_inferior(self, inferior):
@@ -71,6 +65,6 @@ class InferiorManager(object):
     def inferior(self, inferior_id):
         if inferior_id in self._inferiors:
             return self._inferiors[inferior_id]
-        inferior = TargetFactory().create_inferior(inferior_id)
+        inferior = self._target_factory.create_inferior(inferior_id)
         self.add_inferior(inferior)
         return inferior

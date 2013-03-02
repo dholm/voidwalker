@@ -26,7 +26,7 @@ from .target import TestInferior
 
 
 class TestCommandFactory(CommandFactory, object):
-    def create_command(self, command_type):
+    def create(self, command_type):
         if issubclass(command_type, DataCommand):
             class TestDataCommand(command_type):
                 __doc__ = command_type.__doc__

@@ -17,7 +17,6 @@
 from framework.target import Inferior
 from framework.target import TargetFactory
 from framework.target import Thread
-from framework.utils import singleton_implementation
 
 from .platform import TestCpu
 
@@ -55,12 +54,8 @@ class TestInferior(Inferior):
         pass
 
 
-@singleton_implementation(TargetFactory)
-class TestTargetFactory(object):
-    def __init__(self):
-        self._cpu_factory = None
-
-    def init(self, cpu_factory):
+class TestTargetFactory(TargetFactory, object):
+    def __init__(self, cpu_factory):
         self._cpu_factory = cpu_factory
 
     def create_inferior(self, inferior_id):

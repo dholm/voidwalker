@@ -19,7 +19,6 @@ from flowui.widgets import Section
 from framework.interface.command import DataCommand
 from framework.interface.command import PrefixCommand
 from framework.interface.command import register_command
-from framework.target.inferior import InferiorManager
 from framework.types.data import DataChunk
 from framework.types.data import DataWidget
 from framework.types.instructions import InstructionListingWidget
@@ -63,7 +62,7 @@ data widget which displays it in hexadecimal and ascii form (when possible).'''
         address = abs(long(arguments[0]))
         size = abs(long(arguments[1]))
 
-        inferior = InferiorManager().inferior(thread.inferior_id())
+        inferior = self._inferior_repository.inferior(thread.inferior_id())
         data_dump = inferior.read_memory(address, size)
         data_chunk = DataChunk(address, data_dump)
 
@@ -97,7 +96,7 @@ output.'''
         address = abs(long(arguments[0]))
         size = abs(long(arguments[1]))
 
-        inferior = InferiorManager().inferior(thread.inferior_id())
+        inferior = self._inferior_repository.inferior(thread.inferior_id())
         listing = inferior.disassemble(address, size)
 
         section = Section('0x%016lX' % address)

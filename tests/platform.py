@@ -18,14 +18,14 @@ from unittest import TestCase
 
 from framework.platform import CpuFactory
 from framework.platform import PlatformFactory
-from framework.target.inferior import InferiorManager
-from framework.target.inferior import TargetFactory
+from framework.target import InferiorRepository
 
 from application.cpus import MipsCpu
 from application.cpus import X8664Cpu
 from application.cpus import X86Cpu
 
-from backends.test.platform import TestCpu
+from backends.test import TestCpu
+from backends.test import TestTargetFactory
 
 
 class CpuTest(TestCase):
@@ -55,13 +55,14 @@ class CpuTest(TestCase):
 
 class ContextTest(TestCase):
     def setUp(self):
-        TargetFactory().init(CpuFactory())
-        TargetFactory().create_inferior(0)
-        inferior = InferiorManager().inferior(0)
-        TargetFactory().create_thread(inferior, 0)
+        target_factory = TestTargetFactory(CpuFactory())
+        target_factory.create_inferior(0)
+        self._inferior_repository = InferiorRepository(target_factory)
+        inferior = self._inferior_repository.inferior(0)
+        target_factory.create_thread(inferior, 0)
 
     def test_registers(self):
-        inferior = InferiorManager().inferior(0)
+        inferior = self._inferior_repository.inferior(0)
         thread = inferior.thread(0)
         context = PlatformFactory().create_context(inferior, thread)
         for _, register_dict in inferior.cpu().registers():

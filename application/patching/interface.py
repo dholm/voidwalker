@@ -25,7 +25,6 @@ from framework.interface import SupportCommand
 from framework.interface import register_command
 from framework.patching import SnippetManager
 from framework.platform import Architecture
-from framework.target import InferiorManager
 
 from ..commands.voidwalker import VoidwalkerCommand
 
@@ -99,7 +98,7 @@ touched by this command.'''
             self._terminal.write('%(face-error)sWrong number of arguments!\n')
             return
 
-        inferior = InferiorManager().inferior(thread.inferior_id())
+        inferior = self._inferior_repository.inferior(thread.inferior_id())
         snippet = SnippetManager().snippet(arguments[0])
         if snippet is None:
             self._terminal.write(' '.join(['%(face-error)sSnippet',

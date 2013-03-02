@@ -16,20 +16,18 @@
 
 import gdb
 
-from framework.interface.command import BreakpointCommand
-from framework.interface.command import Command
-from framework.interface.command import CommandFactory
-from framework.interface.command import DataCommand
-from framework.interface.command import PrefixCommand
-from framework.interface.command import StackCommand
-from framework.interface.command import SupportCommand
-from framework.target.factory import TargetFactory
-from framework.target.inferior import InferiorManager
+from framework.interface import BreakpointCommand
+from framework.interface import Command
+from framework.interface import CommandFactory
+from framework.interface import DataCommand
+from framework.interface import PrefixCommand
+from framework.interface import StackCommand
+from framework.interface import SupportCommand
 
 
-def get_current_inferior():
+def get_current_inferior(inferior_repository):
     inferior_num = gdb.selected_inferior().num
-    inferior = InferiorManager().inferior(inferior_num)
+    inferior = inferior_repository.inferior(inferior_num)
     if not inferior:
         raise gdb.GdbError(('Inferior %d does not exist!' %
                             inferior_num))
@@ -37,13 +35,13 @@ def get_current_inferior():
     return inferior
 
 
-def get_current_thread():
+def get_current_thread(inferior_repository, target_factory):
     if gdb.selected_thread() is not None:
         thread_num = gdb.selected_thread().num
 
-        inferior = get_current_inferior()
+        inferior = get_current_inferior(inferior_repository)
         if not inferior.has_thread(thread_num):
-            TargetFactory().create_thread(inferior, thread_num)
+            target_factory.create_thread(inferior, thread_num)
 
         if inferior.has_thread(thread_num):
             return inferior.thread(thread_num)
@@ -64,7 +62,7 @@ def parse_argument_list(argument):
 
 
 class GdbCommandFactory(CommandFactory, object):
-    def create_command(self, command_type):
+    def create(self, command_type):
         if issubclass(command_type, DataCommand):
             class GdbDataCommand(gdb.Command, command_type):
                 __doc__ = command_type.__doc__
@@ -75,7 +73,8 @@ class GdbCommandFactory(CommandFactory, object):
                                          gdb.COMMAND_DATA, gdb.COMPLETE_NONE)
 
                 def invoke(self, argument, from_tty):
-                    thread = get_current_thread()
+                    thread = get_current_thread(self._inferior_repository,
+                                                self._target_factory)
                     if thread is not None:
                         args = parse_argument_list(argument)
                         command_type.invoke(self, thread, args, from_tty)
@@ -92,7 +91,8 @@ class GdbCommandFactory(CommandFactory, object):
                                          gdb.COMMAND_STACK, gdb.COMPLETE_NONE)
 
                 def invoke(self, argument, from_tty):
-                    thread = get_current_thread()
+                    thread = get_current_thread(self._inferior_repository,
+                                                self._target_factory)
                     if thread is not None:
                         args = parse_argument_list(argument)
                         command_type.invoke(self, thread, args, from_tty)
@@ -132,7 +132,7 @@ class GdbCommandFactory(CommandFactory, object):
                                          gdb.COMPLETE_NONE)
 
                 def invoke(self, argument, from_tty):
-                    inferior = get_current_inferior()
+                    inferior = get_current_inferior(self._inferior_repository)
                     if inferior is not None:
                         args = parse_argument_list(argument)
                         command_type.invoke(self, inferior, args, from_tty)

@@ -16,5 +16,5 @@
 
 from .factory import TargetFactory
 from .inferior import Inferior
-from .inferior import InferiorManager
+from .inferior import InferiorRepository
 from .thread import Thread

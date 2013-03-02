@@ -37,12 +37,12 @@ from framework.interface import CommandBuilder
 from framework.interface import Configuration
 from framework.interface import ParameterBuilder
 from framework.platform import CpuFactory
-from framework.target import InferiorManager
-from framework.target import TargetFactory
+from framework.target import InferiorRepository
 
 from backends.gdb import ConvenienceManager
 from backends.gdb import GdbCommandFactory
 from backends.gdb import GdbParameterFactory
+from backends.gdb import GdbTargetFactory
 from backends.gdb import GdbTerminal
 
 version = '0.0.0'
@@ -50,11 +50,12 @@ version = '0.0.0'
 config = Configuration()
 ParameterBuilder(GdbParameterFactory(), config)
 
+target_factory = GdbTargetFactory(CpuFactory())
+inferior_repository = InferiorRepository(target_factory)
 ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
-CommandBuilder(GdbCommandFactory(), config, ansi_terminal)
+CommandBuilder(GdbCommandFactory(), inferior_repository, target_factory,
+               config, ansi_terminal)
 
-TargetFactory().init(CpuFactory())
-InferiorManager().init()
 ConvenienceManager().init()
 
 ansi_terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '

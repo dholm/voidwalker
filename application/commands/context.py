@@ -19,12 +19,11 @@ from flowui.widgets import Section
 from flowui.widgets.table import Cell
 from flowui.widgets.table import Table
 
-from framework.interface.command import StackCommand
-from framework.interface.command import register_command
-from framework.platform.factory import PlatformFactory
-from framework.target.inferior import InferiorManager
-from framework.types.data import DataWidget
-from framework.types.instructions import InstructionListingWidget
+from framework.interface import StackCommand
+from framework.interface import register_command
+from framework.platform import PlatformFactory
+from framework.types import DataWidget
+from framework.types import InstructionListingWidget
 
 from .voidwalker import VoidwalkerCommand
 
@@ -116,7 +115,7 @@ parameters'''
         if not thread.is_valid():
             return
 
-        inferior = InferiorManager().inferior(thread.inferior_id())
+        inferior = self._inferior_repository.inferior(thread.inferior_id())
         context = PlatformFactory().create_context(self._config, inferior,
                                                    thread)
         previous_context = context

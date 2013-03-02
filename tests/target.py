@@ -17,27 +17,29 @@
 from unittest import TestCase
 
 from framework.platform import CpuFactory
-from framework.target import InferiorManager
-from framework.target import TargetFactory
+from framework.target import InferiorRepository
+
+from backends.test import TestTargetFactory
 
 from .platform import TestCpu
 
 
 class InferiorTest(TestCase):
     def setUp(self):
-        TargetFactory().init(CpuFactory())
-        TargetFactory().create_inferior(0)
-        inferior = InferiorManager().inferior(0)
-        TargetFactory().create_thread(inferior, 0)
+        target_factory = TestTargetFactory(CpuFactory())
+        target_factory.create_inferior(0)
+        self._inferior_repository = InferiorRepository(target_factory)
+        inferior = self._inferior_repository.inferior(0)
+        target_factory.create_thread(inferior, 0)
 
     def test_inferior(self):
-        inferior = InferiorManager().inferior(0)
+        inferior = self._inferior_repository.inferior(0)
         self.assertEqual(0, inferior.id())
         self.assertEqual(inferior.cpu().architecture(),
                          TestCpu().architecture())
 
     def test_thread(self):
-        inferior = InferiorManager().inferior(0)
+        inferior = self._inferior_repository.inferior(0)
         self.assertTrue(inferior.has_thread(0))
         thread = inferior.thread(0)
         self.assertEqual(0, thread.id())
