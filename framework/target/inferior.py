@@ -14,15 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..utils.decorators import singleton
+import abc
+
+from ..utils import singleton
 from .factory import TargetFactory
 
 
 class Inferior(object):
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self, cpu):
         self._cpu = cpu
         self._threads = {}
 
+    @abc.abstractmethod
     def id(self):
         raise NotImplementedError
 
@@ -39,12 +44,15 @@ class Inferior(object):
         assert self.has_thread(thread_id)
         return self._threads[thread_id]
 
+    @abc.abstractmethod
     def disassemble(self, address, length):
         raise NotImplementedError
 
+    @abc.abstractmethod
     def read_memory(self, address, length):
         raise NotImplementedError
 
+    @abc.abstractmethod
     def write_memory(self, buf, address):
         raise NotImplementedError
 

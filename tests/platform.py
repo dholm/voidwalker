@@ -16,24 +16,24 @@
 
 from unittest import TestCase
 
-from framework.platform.architecture import ArchitectureManager
-from framework.platform.factory import PlatformFactory
+from framework.platform import CpuFactory
+from framework.platform import PlatformFactory
 from framework.target.inferior import InferiorManager
 from framework.target.inferior import TargetFactory
 
-from application.cpus.mips import MipsCpu
-from application.cpus.x86 import X86Cpu
-from application.cpus.x86_64 import X8664Cpu
+from application.cpus import MipsCpu
+from application.cpus import X8664Cpu
+from application.cpus import X86Cpu
 
 from backends.test.platform import TestCpu
 
 
 class CpuTest(TestCase):
     def setUp(self):
-        PlatformFactory().reset()
+        self._cpu_factory = CpuFactory()
 
     def test_test(self):
-        cpu = ArchitectureManager().create_cpu(TestCpu.architecture())
+        cpu = self._cpu_factory.create(TestCpu.architecture())
         for register_list in TestCpu.register_dict.itervalues():
             for name in register_list:
                 self.assertIsNotNone(cpu.register(name))
@@ -41,20 +41,21 @@ class CpuTest(TestCase):
                 self.assertEqual(name, register.name())
 
     def test_x86(self):
-        cpu = ArchitectureManager().create_cpu(X86Cpu.architecture())
+        cpu = self._cpu_factory.create(X86Cpu.architecture())
         self.assertIsNotNone(cpu.register('eax'))
 
     def test_x86_64(self):
-        cpu = ArchitectureManager().create_cpu(X8664Cpu.architecture())
+        cpu = self._cpu_factory.create(X8664Cpu.architecture())
         self.assertIsNotNone(cpu.register('rax'))
 
     def test_mips(self):
-        cpu = ArchitectureManager().create_cpu(MipsCpu.architecture())
+        cpu = self._cpu_factory.create(MipsCpu.architecture())
         self.assertIsNotNone(cpu.register('a0'))
 
 
 class ContextTest(TestCase):
     def setUp(self):
+        TargetFactory().init(CpuFactory())
         TargetFactory().create_inferior(0)
         inferior = InferiorManager().inferior(0)
         TargetFactory().create_thread(inferior, 0)
@@ -63,7 +64,7 @@ class ContextTest(TestCase):
         inferior = InferiorManager().inferior(0)
         thread = inferior.thread(0)
         context = PlatformFactory().create_context(inferior, thread)
-        for group, register_dict in inferior.cpu().registers():
+        for _, register_dict in inferior.cpu().registers():
             for name, register in register_dict.iteritems():
                 self.assertIsNotNone(context.register(name))
                 context_register = context.register(name)

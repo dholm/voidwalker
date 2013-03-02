@@ -26,7 +26,7 @@ import application.cpus.x86_instructions as x86
 @register_snippet
 class NopSnippet(Snippet):
     _code = {Architecture.X86: CodeBlock(x86.nop()),
-             Architecture.MIPS: CodeBlock(mips.nop())}
+             Architecture.Mips: CodeBlock(mips.nop())}
 
     def __init__(self):
         pass

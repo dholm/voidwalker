@@ -19,13 +19,13 @@ from flowui.widgets.table import Cell
 from flowui.widgets.table import Row
 from flowui.widgets.table import Table
 
-from framework.interface.command import PrefixCommand
-from framework.interface.command import StackCommand
-from framework.interface.command import SupportCommand
-from framework.interface.command import register_command
-from framework.patching.snippet import SnippetManager
-from framework.platform.cpu import Architecture
-from framework.target.inferior import InferiorManager
+from framework.interface import PrefixCommand
+from framework.interface import StackCommand
+from framework.interface import SupportCommand
+from framework.interface import register_command
+from framework.patching import SnippetManager
+from framework.platform import Architecture
+from framework.target import InferiorManager
 
 from ..commands.voidwalker import VoidwalkerCommand
 
@@ -109,7 +109,7 @@ touched by this command.'''
 
         architecture = inferior.cpu().architecture()
         implementation = None
-        if ((architecture == Architecture.X86_64 and
+        if ((architecture == Architecture.X8664 and
              architecture not in snippet.architectures())):
             assert Architecture.X86 in snippet.architectures()
             implementation = snippet.implementation(Architecture.X86)

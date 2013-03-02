@@ -14,17 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import abc
+
 from collections import OrderedDict
 
+from ..utils import enum
 from .factory import PlatformFactory
 
 
-class Architecture:
-    Test = 0
-    X86 = 1
-    X86_64 = 2
-    MIPS = 3
-    ARM = 4
+Architecture = enum('Test', 'X86', 'X8664', 'Mips', 'Arm',
+                    enum_type='Architecture')
 
 
 class Register(object):
@@ -71,6 +70,8 @@ def create_static_register(register):
 
 
 class Cpu(object):
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self, registers):
         self._registers = OrderedDict()
         for group, register_list in registers.iteritems():
@@ -81,6 +82,7 @@ class Cpu(object):
             self._registers[group] = registers
 
     @staticmethod
+    @abc.abstractmethod
     def architecture():
         raise NotImplementedError
 
@@ -94,8 +96,23 @@ class Cpu(object):
     def registers(self):
         return self._registers.iteritems()
 
+    @abc.abstractmethod
     def stack_pointer(self):
         raise NotImplementedError
 
+    @abc.abstractmethod
     def program_counter(self):
         raise NotImplementedError
+
+
+class CpuFactory(object):
+    def create(self, architecture):
+        assert architecture in _architecture_map
+        return _architecture_map.get(architecture, None)()
+
+
+def register_cpu(cls):
+    _architecture_map[cls.architecture()] = cls
+    return cls
+
+_architecture_map = {}

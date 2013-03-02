@@ -14,13 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..utils.decorators import singleton_specification
+import abc
+
+from ..utils import singleton_specification
 
 
 @singleton_specification
 class TargetFactory(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def init(self, cpu_factory):
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def create_inferior(self, inferior_id):
         raise NotImplementedError
 
+    @abc.abstractmethod
     def create_thread(self, inferior, thread_id):
         raise NotImplementedError

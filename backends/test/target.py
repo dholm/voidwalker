@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from framework.target.inferior import Inferior
-from framework.target.inferior import TargetFactory
-from framework.target.thread import Thread
-from framework.utils.decorators import singleton_implementation
+from framework.target import Inferior
+from framework.target import TargetFactory
+from framework.target import Thread
+from framework.utils import singleton_implementation
 
 from .platform import TestCpu
 
@@ -51,14 +51,20 @@ class TestInferior(Inferior):
     def read_memory(self, address, length):
         return None
 
+    def write_memory(self, buf, address):
+        pass
+
 
 @singleton_implementation(TargetFactory)
 class TestTargetFactory(object):
     def __init__(self):
-        pass
+        self._cpu_factory = None
+
+    def init(self, cpu_factory):
+        self._cpu_factory = cpu_factory
 
     def create_inferior(self, inferior_id):
-        cpu = TestCpu()
+        cpu = self._cpu_factory.create(TestCpu.architecture())
         return TestInferior(cpu, inferior_id)
 
     def create_thread(self, inferior, thread_id):

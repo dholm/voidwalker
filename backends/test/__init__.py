@@ -14,6 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['platform',
-           'target',
-           'interface']
+from .platform import TestCpu
+from .platform import TestPlatformFactory
+from .target import TestThread
+from .target import TestInferior
+from .target import TestTargetFactory
+
+from .interface import TestCommandFactory
+from .interface import TestParameterFactory

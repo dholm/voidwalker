@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['inferior',
-           'thread',
-           'factory']
+from .factory import TargetFactory
+from .inferior import Inferior
+from .inferior import InferiorManager
+from .thread import Thread

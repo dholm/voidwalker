@@ -14,13 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from framework.interface.command import Command
-from framework.interface.command import CommandFactory
-from framework.interface.command import DataCommand
-from framework.interface.parameter import BooleanParameter
-from framework.interface.parameter import EnumParameter
-from framework.interface.parameter import Parameter
-from framework.interface.parameter import ParameterFactory
+from framework.interface import BooleanParameter
+from framework.interface import Command
+from framework.interface import CommandFactory
+from framework.interface import DataCommand
+from framework.interface import EnumParameter
+from framework.interface import Parameter
+from framework.interface import ParameterFactory
 
 from .target import TestInferior
 

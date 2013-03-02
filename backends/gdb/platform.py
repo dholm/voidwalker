@@ -18,11 +18,11 @@ from collections import OrderedDict
 import gdb
 import re
 
-from framework.platform.context import Context
-from framework.platform.cpu import create_static_register
-from framework.platform.factory import PlatformFactory
-from framework.types.data import DataChunk
-from framework.utils.decorators import singleton_implementation
+from framework.platform import Context
+from framework.platform import PlatformFactory
+from framework.platform import create_static_register
+from framework.types import DataChunk
+from framework.utils import singleton_implementation
 
 from application.parameters.context import ContextInstructionsParameter
 from application.parameters.context import ContextStackParameter

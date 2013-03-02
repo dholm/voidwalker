@@ -1,13 +1,13 @@
 from collections import OrderedDict
 
-from framework.platform.architecture import register_cpu
-from framework.platform.context import Context
-from framework.platform.cpu import Architecture
-from framework.platform.cpu import Cpu
-from framework.platform.cpu import Register
-from framework.platform.cpu import create_static_register
-from framework.platform.factory import PlatformFactory
-from framework.utils.decorators import singleton_implementation
+from framework.platform import Architecture
+from framework.platform import Context
+from framework.platform import Cpu
+from framework.platform import PlatformFactory
+from framework.platform import Register
+from framework.platform import create_static_register
+from framework.platform import register_cpu
+from framework.utils import singleton_implementation
 
 
 @register_cpu

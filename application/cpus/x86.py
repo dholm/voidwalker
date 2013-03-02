@@ -16,10 +16,10 @@
 
 from collections import OrderedDict
 
-from framework.platform.architecture import register_cpu
-from framework.platform.cpu import Architecture
-from framework.platform.cpu import Cpu
-from framework.platform.cpu import Register
+from framework.platform import Architecture
+from framework.platform import Cpu
+from framework.platform import Register
+from framework.platform import register_cpu
 
 
 class EflagsRegister(Register):

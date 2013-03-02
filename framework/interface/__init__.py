@@ -14,14 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .command import Command
-from .command import PrefixCommand
-from .command import DataCommand
-from .command import StackCommand
 from .command import BreakpointCommand
-from .command import SupportCommand
-from .command import CommandFactory
+from .command import Command
 from .command import CommandBuilder
+from .command import CommandFactory
+from .command import DataCommand
+from .command import PrefixCommand
+from .command import StackCommand
+from .command import SupportCommand
+from .command import register_command
 
 from .parameter import Parameter
 from .parameter import PrefixParameter

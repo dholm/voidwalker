@@ -18,14 +18,13 @@ import gdb
 import os.path
 import re
 
-from framework.platform.architecture import ArchitectureManager
-from framework.platform.cpu import Architecture
+from framework.platform import Architecture
 from framework.target.factory import TargetFactory
 from framework.target.inferior import Inferior
 from framework.target.thread import Thread
 from framework.types.instructions import Instruction
 from framework.types.instructions import InstructionListing
-from framework.utils.decorators import singleton_implementation
+from framework.utils import singleton_implementation
 
 
 class GdbThread(Thread):
@@ -102,18 +101,21 @@ class GdbTargetFactory(object):
                                        r'(?P<path>.+)$'))
 
     def __init__(self):
-        pass
+        self._cpu_factory = None
+
+    def init(self, cpu_factory):
+        self._cpu_factory = cpu_factory
 
     @staticmethod
     def _target_to_architecture(target):
         if re.match(r'.*-x86-64', target):
-            return Architecture.X86_64
+            return Architecture.X8664
         if re.match(r'.*-i386', target):
             return Architecture.X86
         if re.match(r'.*-.*mips[^-]*', target):
-            return Architecture.MIPS
+            return Architecture.Mips
         if re.match(r'.*-arm[^-]*', target):
-            return Architecture.ARM
+            return Architecture.Arm
         return None
 
     def create_inferior(self, inferior_id):
@@ -137,7 +139,7 @@ class GdbTargetFactory(object):
                       if os.path.abspath(i[0]).strip() == inferior_path).next()
 
             architecture = self._target_to_architecture(target)
-            cpu = ArchitectureManager().create_cpu(architecture)
+            cpu = self._cpu_factory.create(architecture)
 
         except TypeError:
             return None

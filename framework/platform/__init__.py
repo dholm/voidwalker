@@ -14,7 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['architecture',
-           'context',
-           'cpu',
-           'factory']
+from .cpu import Architecture
+from .cpu import Cpu
+from .cpu import CpuFactory
+from .cpu import Register
+from .cpu import create_static_register
+from .cpu import register_cpu
+
+from .context import Context
+
+from .factory import PlatformFactory

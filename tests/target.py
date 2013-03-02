@@ -16,14 +16,16 @@
 
 from unittest import TestCase
 
-from framework.target.inferior import InferiorManager
-from framework.target.inferior import TargetFactory
+from framework.platform import CpuFactory
+from framework.target import InferiorManager
+from framework.target import TargetFactory
 
 from .platform import TestCpu
 
 
 class InferiorTest(TestCase):
     def setUp(self):
+        TargetFactory().init(CpuFactory())
         TargetFactory().create_inferior(0)
         inferior = InferiorManager().inferior(0)
         TargetFactory().create_thread(inferior, 0)

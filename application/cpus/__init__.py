@@ -14,12 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['mips',
-           'x86',
-           'x86_64',
+from mips import MipsCpu
+from x86 import X86Cpu
+from x86_64 import X8664Cpu
 
-           'mips_instructions',
-           'x86_instructions']
-
-# Automatically register all CPUs
-from . import *
+import mips_instructions
+import x86_instructions

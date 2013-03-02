@@ -14,4 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['decorators', 'recipes']
+
+from .decorators import singleton
+from .decorators import SingletonManager
+from .decorators import singleton_specification
+from .decorators import singleton_implementation
+
+from .enum import enum
+
+from .recipes import grouper
