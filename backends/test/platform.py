@@ -7,7 +7,6 @@ from framework.platform import PlatformFactory
 from framework.platform import Register
 from framework.platform import create_static_register
 from framework.platform import register_cpu
-from framework.utils import singleton_implementation
 
 
 @register_cpu
@@ -15,11 +14,11 @@ class TestCpu(Cpu):
     register_dict = OrderedDict([('gp', ('r0 r1').split()),
                                  ('sp', ('pc sp flags').split())])
 
-    def __init__(self):
+    def __init__(self, platform_factory):
         registers = OrderedDict()
-        for group, register_list in self.register_dict.iteritems():
+        for group, register_list in self.register_dict.items():
             registers[group] = [Register(x) for x in register_list]
-        super(TestCpu, self).__init__(registers)
+        super(TestCpu, self).__init__(platform_factory, registers)
 
     @staticmethod
     def architecture():
@@ -32,8 +31,7 @@ class TestCpu(Cpu):
         return self.register('pc')
 
 
-@singleton_implementation(PlatformFactory)
-class TestPlatformFactory(object):
+class TestPlatformFactory(PlatformFactory, object):
     def __init__(self):
         self._registers = None
         self.reset()
@@ -57,7 +55,7 @@ class TestPlatformFactory(object):
         self._registers[register.name()] = TestRegister(register.name())
         return self._registers[register.name()]
 
-    def create_context(self, inferior, thread):
+    def create_context(self, config, inferior, thread):
         class TestContext(Context):
             def __init__(self):
                 sp = inferior.cpu().stack_pointer()

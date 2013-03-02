@@ -24,7 +24,9 @@ class Command(object):
         self._config = None
         self._terminal = None
 
-    def init(self, inferior_repository, target_factory, config, terminal):
+    def init(self, inferior_repository, platform_factory, target_factory,
+             config, terminal):
+        self._platform_factory = platform_factory
         self._inferior_repository = inferior_repository
         self._target_factory = target_factory
         self._config = config
@@ -81,13 +83,14 @@ class CommandFactory(object):
 
 
 class CommandBuilder(object):
-    def __init__(self, command_factory, inferior_repository, target_factory,
-                 config, terminal):
+    def __init__(self, command_factory, inferior_repository, platform_factory,
+                 target_factory, config, terminal):
         self._commands = {}
         for Cmd in _command_list:
             self._commands[Cmd.name()] = command_factory.create(Cmd)
             self._commands[Cmd.name()].init(inferior_repository,
-                                            target_factory, config, terminal)
+                                            platform_factory, target_factory,
+                                            config, terminal)
 
     def command(self, name):
         assert name in self._commands

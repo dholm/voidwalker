@@ -14,13 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..utils.decorators import singleton_specification
+import abc
 
 
-@singleton_specification
 class PlatformFactory(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def create_register(self, register):
         raise NotImplementedError
 
-    def create_context(self, inferior, thread):
+    @abc.abstractmethod
+    def create_context(self, config, inferior, thread):
         raise NotImplementedError

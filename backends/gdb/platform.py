@@ -22,14 +22,12 @@ from framework.platform import Context
 from framework.platform import PlatformFactory
 from framework.platform import create_static_register
 from framework.types import DataChunk
-from framework.utils import singleton_implementation
 
 from application.parameters.context import ContextInstructionsParameter
 from application.parameters.context import ContextStackParameter
 
 
-@singleton_implementation(PlatformFactory)
-class GdbPlatformFactory(object):
+class GdbPlatformFactory(PlatformFactory, object):
     def create_register(self, register):
         class GdbRegister(type(register), object):
             _value_exp = re.compile(r'(?P<variable>.+)\s*=\s*(?P<value>.+)')

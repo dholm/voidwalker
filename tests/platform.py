@@ -16,8 +16,8 @@
 
 from unittest import TestCase
 
+from framework.interface import Configuration
 from framework.platform import CpuFactory
-from framework.platform import PlatformFactory
 from framework.target import InferiorRepository
 
 from application.cpus import MipsCpu
@@ -25,16 +25,18 @@ from application.cpus import X8664Cpu
 from application.cpus import X86Cpu
 
 from backends.test import TestCpu
+from backends.test import TestPlatformFactory
 from backends.test import TestTargetFactory
 
 
 class CpuTest(TestCase):
     def setUp(self):
-        self._cpu_factory = CpuFactory()
+        platform_factory = TestPlatformFactory()
+        self._cpu_factory = CpuFactory(platform_factory)
 
     def test_test(self):
         cpu = self._cpu_factory.create(TestCpu.architecture())
-        for register_list in TestCpu.register_dict.itervalues():
+        for register_list in TestCpu.register_dict.values():
             for name in register_list:
                 self.assertIsNotNone(cpu.register(name))
                 register = cpu.register(name)
@@ -55,7 +57,8 @@ class CpuTest(TestCase):
 
 class ContextTest(TestCase):
     def setUp(self):
-        target_factory = TestTargetFactory(CpuFactory())
+        self._platform_factory = TestPlatformFactory()
+        target_factory = TestTargetFactory(CpuFactory(self._platform_factory))
         target_factory.create_inferior(0)
         self._inferior_repository = InferiorRepository(target_factory)
         inferior = self._inferior_repository.inferior(0)
@@ -64,7 +67,8 @@ class ContextTest(TestCase):
     def test_registers(self):
         inferior = self._inferior_repository.inferior(0)
         thread = inferior.thread(0)
-        context = PlatformFactory().create_context(inferior, thread)
+        context = self._platform_factory.create_context(Configuration(),
+                                                        inferior, thread)
         for _, register_dict in inferior.cpu().registers():
             for name, register in register_dict.iteritems():
                 self.assertIsNotNone(context.register(name))

@@ -32,12 +32,12 @@ class X8664Cpu(Cpu):
                                       'st7').split()),
                               ('sp', ('cs ss ds es fs gs rip').split())])
 
-    def __init__(self):
+    def __init__(self, platform_factory):
         registers = OrderedDict()
         for group, register_list in self._registers.iteritems():
             registers[group] = [Register(x) for x in register_list]
         registers['sp'].append(EflagsRegister('eflags'))
-        super(X8664Cpu, self).__init__(registers)
+        super(X8664Cpu, self).__init__(platform_factory, registers)
 
     @staticmethod
     def architecture():

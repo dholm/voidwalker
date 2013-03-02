@@ -42,6 +42,7 @@ from framework.target import InferiorRepository
 from backends.gdb import ConvenienceManager
 from backends.gdb import GdbCommandFactory
 from backends.gdb import GdbParameterFactory
+from backends.gdb import GdbPlatformFactory
 from backends.gdb import GdbTargetFactory
 from backends.gdb import GdbTerminal
 
@@ -50,11 +51,12 @@ version = '0.0.0'
 config = Configuration()
 ParameterBuilder(GdbParameterFactory(), config)
 
-target_factory = GdbTargetFactory(CpuFactory())
+platform_factory = GdbPlatformFactory()
+target_factory = GdbTargetFactory(CpuFactory(platform_factory))
 inferior_repository = InferiorRepository(target_factory)
 ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
-CommandBuilder(GdbCommandFactory(), inferior_repository, target_factory,
-               config, ansi_terminal)
+CommandBuilder(GdbCommandFactory(), inferior_repository, platform_factory,
+               target_factory, config, ansi_terminal)
 
 ConvenienceManager().init()
 

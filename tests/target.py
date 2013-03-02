@@ -19,6 +19,7 @@ from unittest import TestCase
 from framework.platform import CpuFactory
 from framework.target import InferiorRepository
 
+from backends.test import TestPlatformFactory
 from backends.test import TestTargetFactory
 
 from .platform import TestCpu
@@ -26,7 +27,8 @@ from .platform import TestCpu
 
 class InferiorTest(TestCase):
     def setUp(self):
-        target_factory = TestTargetFactory(CpuFactory())
+        self._platform_factory = TestPlatformFactory()
+        target_factory = TestTargetFactory(CpuFactory(self._platform_factory))
         target_factory.create_inferior(0)
         self._inferior_repository = InferiorRepository(target_factory)
         inferior = self._inferior_repository.inferior(0)
@@ -36,7 +38,7 @@ class InferiorTest(TestCase):
         inferior = self._inferior_repository.inferior(0)
         self.assertEqual(0, inferior.id())
         self.assertEqual(inferior.cpu().architecture(),
-                         TestCpu().architecture())
+                         TestCpu(self._platform_factory).architecture())
 
     def test_thread(self):
         inferior = self._inferior_repository.inferior(0)

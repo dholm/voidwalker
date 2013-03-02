@@ -34,6 +34,7 @@ from framework.target import InferiorRepository
 
 from backends.test import TestCommandFactory
 from backends.test import TestParameterFactory
+from backends.test import TestPlatformFactory
 from backends.test import TestTargetFactory
 
 
@@ -56,10 +57,12 @@ class CommandTest(TestCase):
         self._terminal = AnsiTerminal(SysTerminal(), Solarized())
 
     def test_command(self):
-        target_factory = TestTargetFactory(CpuFactory())
+        platform_factory = TestPlatformFactory()
+        target_factory = TestTargetFactory(CpuFactory(platform_factory))
         inferior_repository = InferiorRepository(target_factory)
         bldr = CommandBuilder(TestCommandFactory(), inferior_repository,
-                              target_factory, Configuration(), self._terminal)
+                              platform_factory, target_factory,
+                              Configuration(), self._terminal)
 
         self.assertIsNotNone(bldr.command(TestCommand.name()))
         self.assertIsNotNone(bldr.command(TestDataCommand.name()))

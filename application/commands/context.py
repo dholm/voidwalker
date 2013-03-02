@@ -116,8 +116,8 @@ parameters'''
             return
 
         inferior = self._inferior_repository.inferior(thread.inferior_id())
-        context = PlatformFactory().create_context(self._config, inferior,
-                                                   thread)
+        context = self._platform_factory.create_context(self._config, inferior,
+                                                        thread)
         previous_context = context
         if len(thread.contexts()):
             previous_context = thread.contexts()[-1]

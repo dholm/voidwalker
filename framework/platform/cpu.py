@@ -19,7 +19,6 @@ import abc
 from collections import OrderedDict
 
 from ..utils import enum
-from .factory import PlatformFactory
 
 
 Architecture = enum('Test', 'X86', 'X8664', 'Mips', 'Arm',
@@ -72,11 +71,11 @@ def create_static_register(register):
 class Cpu(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, registers):
+    def __init__(self, platform_factory, registers):
         self._registers = OrderedDict()
         for group, register_list in registers.iteritems():
             registers = OrderedDict([(x.name(),
-                                      PlatformFactory().create_register(x))
+                                      platform_factory.create_register(x))
                                      for x in register_list])
 
             self._registers[group] = registers
@@ -106,9 +105,13 @@ class Cpu(object):
 
 
 class CpuFactory(object):
+    def __init__(self, platform_factory):
+        self._platform_factory = platform_factory
+
     def create(self, architecture):
         assert architecture in _architecture_map
-        return _architecture_map.get(architecture, None)()
+        return _architecture_map.get(architecture,
+                                     None)(self._platform_factory)
 
 
 def register_cpu(cls):
