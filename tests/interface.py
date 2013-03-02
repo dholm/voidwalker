@@ -19,7 +19,10 @@ from flowui.terminals import SysTerminal
 from flowui.themes import Solarized
 from unittest import TestCase
 
-from framework.interface.command import CommandManager
+from framework.interface.command import Command
+from framework.interface.command import CommandBuilder
+from framework.interface.command import DataCommand
+from framework.interface.command import register_command
 from framework.interface.config import Configuration
 from framework.interface.parameter import BooleanParameter
 from framework.interface.parameter import EnumParameter
@@ -27,9 +30,22 @@ from framework.interface.parameter import Parameter
 from framework.interface.parameter import ParameterBuilder
 from framework.interface.parameter import register_parameter
 
-from backends.test.interface import TestCommand
-from backends.test.interface import TestDataCommand
+from backends.test.interface import TestCommandFactory
 from backends.test.interface import TestParameterFactory
+
+
+@register_command
+class TestCommand(Command):
+    @staticmethod
+    def name():
+        return 'test'
+
+
+@register_command
+class TestDataCommand(DataCommand):
+    @staticmethod
+    def name():
+        return '%s %s' % (TestCommand.name(), 'data')
 
 
 class CommandTest(TestCase):
@@ -37,10 +53,11 @@ class CommandTest(TestCase):
         self._terminal = AnsiTerminal(SysTerminal(), Solarized())
 
     def test_command(self):
-        CommandManager().init(Configuration(), self._terminal)
+        bldr = CommandBuilder(TestCommandFactory(), Configuration(),
+                              self._terminal)
 
-        self.assertIsNotNone(CommandManager().command(TestCommand.name()))
-        self.assertIsNotNone(CommandManager().command(TestDataCommand.name()))
+        self.assertIsNotNone(bldr.command(TestCommand.name()))
+        self.assertIsNotNone(bldr.command(TestDataCommand.name()))
 
 
 @register_parameter

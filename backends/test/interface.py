@@ -17,38 +17,15 @@
 from framework.interface.command import Command
 from framework.interface.command import CommandFactory
 from framework.interface.command import DataCommand
-from framework.interface.command import register_command
 from framework.interface.parameter import BooleanParameter
 from framework.interface.parameter import EnumParameter
 from framework.interface.parameter import Parameter
 from framework.interface.parameter import ParameterFactory
-from framework.utils.decorators import singleton_implementation
 
 from .target import TestInferior
 
 
-@register_command
-class TestCommand(Command):
-    def __init__(self):
-        self._terminal = None
-
-    @staticmethod
-    def name():
-        return 'test'
-
-
-@register_command
-class TestDataCommand(DataCommand):
-    def __init__(self):
-        self._terminal = None
-
-    @staticmethod
-    def name():
-        return '%s %s' % (TestCommand.name(), 'data')
-
-
-@singleton_implementation(CommandFactory)
-class TestCommandFactory(object):
+class TestCommandFactory(CommandFactory, object):
     def create_command(self, command_type):
         if issubclass(command_type, DataCommand):
             class TestDataCommand(command_type):
@@ -57,7 +34,7 @@ class TestCommandFactory(object):
                 def __init__(self):
                     command_type.__init__(self)
 
-                def invoke(self, argument, from_tty):
+                def invoke(self, argument, _):
                     inferior = TestInferior()
                     command_type.invoke(self, inferior, argument)
 
@@ -69,6 +46,10 @@ class TestCommandFactory(object):
 
                 def __init__(self):
                     command_type.__init__(self)
+
+                def invoke(self, argument, _):
+                    inferior = TestInferior()
+                    command_type.invoke(self, inferior, argument)
 
             return TestCommand()
 

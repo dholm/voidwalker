@@ -33,14 +33,15 @@ from application import *
 from application.patching import *
 from backends.gdb.tools import *
 
-from backends.gdb.convenience import ConvenienceManager
-from backends.gdb.parameter import GdbParameterFactory
-from backends.gdb.terminal import GdbTerminal
-
-from framework.interface.command import CommandManager
+from framework.interface.command import CommandBuilder
 from framework.interface.config import Configuration
 from framework.interface.parameter import ParameterBuilder
 from framework.target.inferior import InferiorManager
+
+from backends.gdb.command import GdbCommandFactory
+from backends.gdb.convenience import ConvenienceManager
+from backends.gdb.parameter import GdbParameterFactory
+from backends.gdb.terminal import GdbTerminal
 
 
 version = '0.0.0'
@@ -49,7 +50,7 @@ config = Configuration()
 ParameterBuilder(GdbParameterFactory(), config)
 
 ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
-CommandManager().init(config, ansi_terminal)
+CommandBuilder(GdbCommandFactory(), config, ansi_terminal)
 
 InferiorManager().init()
 ConvenienceManager().init()

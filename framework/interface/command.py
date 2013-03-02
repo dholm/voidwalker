@@ -14,10 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
-
-from ..utils.decorators import singleton
-from ..utils.decorators import singleton_specification
+import abc
 
 
 class Command(object):
@@ -31,59 +28,68 @@ class Command(object):
 
 
 class PrefixCommand(Command):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def invoke(self, *_):
         self._terminal.write('%(face-error)sAttempting to invoke an '
                              'incomplete command!\n')
 
 
 class DataCommand(Command):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def invoke(self, thread, argument, from_tty=False):
         raise NotImplementedError
 
 
 class StackCommand(Command):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def invoke(self, thread, argument, from_tty=False):
         raise NotImplementedError
 
 
 class BreakpointCommand(Command):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def invoke(self, inferior, argument, from_tty=False):
         raise NotImplementedError
 
 
 class SupportCommand(Command):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def invoke(self, argument, from_tty=False):
         raise NotImplementedError
 
 
-@singleton_specification
 class CommandFactory(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def create_command(self, command_type):
         raise NotImplementedError
 
 
-@singleton
-class CommandManager(object):
-    def __init__(self):
-        self._commands = OrderedDict()
-        self._instances = {}
-
-    def init(self, config, terminal):
-        for name, Cmd in self._commands.iteritems():
-            self._instances[name] = CommandFactory().create_command(Cmd)
-            self._instances[name].init(config, terminal)
-
-    def commands(self):
-        return self._commands.iteritems()
+class CommandBuilder(object):
+    def __init__(self, factory, config, terminal):
+        self._commands = {}
+        for Cmd in _command_list:
+            self._commands[Cmd.name()] = factory.create_command(Cmd)
+            self._commands[Cmd.name()].init(config, terminal)
 
     def command(self, name):
         assert name in self._commands
         return self._commands[name]
 
-    def add_command(self, command):
-        self._commands[command.name()] = command
-
 
 def register_command(cls):
-    CommandManager().add_command(cls)
+    _command_list.append(cls)
     return cls
+
+_command_list = []

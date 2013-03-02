@@ -16,14 +16,10 @@
 
 import abc
 
-from ..utils.decorators import singleton
-from ..utils.decorators import singleton_specification
-
-
-_parameter_list = []
-
 
 class Parameter(object):
+    __metaclass__ = abc.ABCMeta
+
     def init(self):
         pass
 
@@ -31,30 +27,43 @@ class Parameter(object):
     def name():
         raise NotImplementedError
 
+    @abc.abstractmethod
     def default_value(self):
         raise NotImplementedError
 
 
 class PrefixParameter(Parameter):
+    __metaclass__ = abc.ABCMeta
+
     @classmethod
     def get_value(cls):
         raise TypeError
 
+    @abc.abstractmethod
     def default_value(self):
         raise NotImplementedError
 
 
 class BooleanParameter(Parameter):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def default_value(self):
         raise NotImplementedError
 
 
 class EnumParameter(Parameter):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def sequence(self):
         raise NotImplementedError
 
 
 class IntegerParameter(Parameter):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def default_value(self):
         raise NotImplementedError
 
@@ -78,3 +87,5 @@ class ParameterBuilder(object):
 def register_parameter(cls):
     _parameter_list.append(cls)
     return cls
+
+_parameter_list = []

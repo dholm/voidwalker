@@ -25,7 +25,6 @@ from framework.interface.command import StackCommand
 from framework.interface.command import SupportCommand
 from framework.target.factory import TargetFactory
 from framework.target.inferior import InferiorManager
-from framework.utils.decorators import singleton_implementation
 
 
 def get_current_inferior():
@@ -64,8 +63,7 @@ def parse_argument_list(argument):
     return args
 
 
-@singleton_implementation(CommandFactory)
-class GdbCommandFactory(object):
+class GdbCommandFactory(CommandFactory, object):
     def create_command(self, command_type):
         if issubclass(command_type, DataCommand):
             class GdbDataCommand(gdb.Command, command_type):

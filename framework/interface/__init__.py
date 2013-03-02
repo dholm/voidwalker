@@ -21,7 +21,7 @@ from .command import StackCommand
 from .command import BreakpointCommand
 from .command import SupportCommand
 from .command import CommandFactory
-from .command import CommandManager
+from .command import CommandBuilder
 
 from .parameter import Parameter
 from .parameter import PrefixParameter
