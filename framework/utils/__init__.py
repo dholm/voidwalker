@@ -15,11 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from .decorators import singleton
-from .decorators import SingletonManager
-from .decorators import singleton_specification
-from .decorators import singleton_implementation
-
 from .enum import enum
 
 from .recipes import grouper

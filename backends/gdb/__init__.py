@@ -19,7 +19,6 @@ from terminal import GdbTerminal
 from parameter import GdbParameterFactory
 from command import GdbCommandFactory
 from platform import GdbPlatformFactory
-from convenience import ConvenienceManager
 from hooks import HookParameter
 from hooks import ContextHookParameter
 from hooks import VoidwalkerHookStop

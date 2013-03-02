@@ -14,5 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['interface',
-           'nop']
+
+from .interface import PatchCommand
+from .interface import SnippetCommand
+from .interface import SnippetCommandBuilder
+from .nop import NopSnippet

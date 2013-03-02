@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .snippet import Snippet
-from .snippet import SnippetManager
+from .snippet import SnippetRepository
 from .snippet import register_snippet
 from .composer import CodeBlock
 from .types import ByteStream

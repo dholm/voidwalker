@@ -14,29 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ..utils import singleton
 
-
-@singleton
-class SnippetManager(object):
-    def __init__(self):
-        self._snippets = {}
-
-    def add_snippet(self, cls):
-        snippet = cls()
-        self._snippets[snippet.name()] = snippet
-
+class SnippetRepository(object):
     def snippet(self, name):
-        assert name in self._snippets
-        return self._snippets[name]
+        assert name in _snippet_map
+        return _snippet_map[name]
 
     def snippets(self):
-        return self._snippets.iteritems()
+        return _snippet_map.items()
 
 
 def register_snippet(cls):
-    SnippetManager().add_snippet(cls)
+    _snippet_map[cls.name()] = cls()
     return cls
+
+_snippet_map = {}
 
 
 class Snippet(object):

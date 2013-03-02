@@ -16,14 +16,15 @@
 
 from unittest import TestCase
 
-from framework.patching.snippet import SnippetManager
+from framework.patching import SnippetRepository
 
-from application.patching import *
+import application.patching
 
 
 class SnippetsTest(TestCase):
     def test_snippet_manager(self):
-        for name, snippet in SnippetManager().snippets():
+        snippet_repository = SnippetRepository()
+        for name, snippet in snippet_repository.snippets():
             print 'Snippet: %s %s' % (name, snippet.description())
             for architecture in snippet.architectures():
                 implementation = snippet.implementation(architecture)

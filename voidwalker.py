@@ -36,20 +36,25 @@ from backends.gdb.tools import *
 from framework.interface import CommandBuilder
 from framework.interface import Configuration
 from framework.interface import ParameterBuilder
+from framework.patching import SnippetRepository
 from framework.platform import CpuFactory
 from framework.target import InferiorRepository
 
-from backends.gdb import ConvenienceManager
 from backends.gdb import GdbCommandFactory
 from backends.gdb import GdbParameterFactory
 from backends.gdb import GdbPlatformFactory
 from backends.gdb import GdbTargetFactory
 from backends.gdb import GdbTerminal
 
+from application.patching import SnippetCommandBuilder
+
 version = '0.0.0'
 
 config = Configuration()
 ParameterBuilder(GdbParameterFactory(), config)
+
+snippet_repository = SnippetRepository()
+SnippetCommandBuilder(snippet_repository)
 
 platform_factory = GdbPlatformFactory()
 target_factory = GdbTargetFactory(CpuFactory(platform_factory))
@@ -57,8 +62,6 @@ inferior_repository = InferiorRepository(target_factory)
 ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
 CommandBuilder(GdbCommandFactory(), inferior_repository, platform_factory,
                target_factory, config, ansi_terminal)
-
-ConvenienceManager().init()
 
 ansi_terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
                      'v%(version)s installed\n'),

@@ -23,7 +23,6 @@ from framework.interface import PrefixCommand
 from framework.interface import StackCommand
 from framework.interface import SupportCommand
 from framework.interface import register_command
-from framework.patching import SnippetManager
 from framework.platform import Architecture
 
 from ..commands.voidwalker import VoidwalkerCommand
@@ -53,74 +52,77 @@ class SnippetCommand(PrefixCommand):
         super(SnippetCommand, self).__init__()
 
 
-@register_command
-class ListSnippetsCommand(SupportCommand):
-    '''List all the available snippets'''
+class SnippetCommandBuilder(object):
+    def __init__(self, snippet_repository):
+        @register_command
+        class ListSnippetsCommand(SupportCommand):
+            '''List all the available snippets'''
 
-    @staticmethod
-    def name():
-        return '%s %s' % (SnippetCommand.name(), 'list')
+            @staticmethod
+            def name():
+                return '%s %s' % (SnippetCommand.name(), 'list')
 
-    def __init__(self):
-        super(ListSnippetsCommand, self).__init__()
+            def __init__(self):
+                super(ListSnippetsCommand, self).__init__()
 
-    def invoke(self, _, from_tty=False):
-        table = Table()
-        for name, snippet in SnippetManager().snippets():
-            row = Row()
-            row.add_cell(Cell('%s%s' % ('%(face-identifier)s', name)))
-            row.add_cell(Cell('%s%s' % ('%(face-comment)s',
-                                        snippet.description())))
-            table.add_row(row)
+            def invoke(self, *_):
+                table = Table()
+                for name, snippet in snippet_repository.snippets():
+                    row = Row()
+                    row.add_cell(Cell('%s%s' % ('%(face-identifier)s', name)))
+                    row.add_cell(Cell('%s%s' % ('%(face-comment)s',
+                                                snippet.description())))
+                    table.add_row(row)
 
-        section = Section('snippets')
-        section.add_component(table)
-        section.draw(self._terminal, self._terminal.width())
+                section = Section('snippets')
+                section.add_component(table)
+                section.draw(self._terminal, self._terminal.width())
 
-
-@register_command
-class ApplySnippetCommand(StackCommand):
-    '''Apply a snippet: <name> <address>
+        @register_command
+        class ApplySnippetCommand(StackCommand):
+            '''Apply a snippet: <name> <address>
 
 Apply the specified snippet at the specified address. This operation will
 overwrite whatever is at that location in memory. The original binary is never
 touched by this command.'''
 
-    @staticmethod
-    def name():
-        return '%s %s' % (SnippetCommand.name(), 'apply')
+            @staticmethod
+            def name():
+                return '%s %s' % (SnippetCommand.name(), 'apply')
 
-    def __init__(self):
-        super(ApplySnippetCommand, self).__init__()
+            def __init__(self):
+                super(ApplySnippetCommand, self).__init__()
 
-    def invoke(self, thread, arguments, from_tty=False):
-        if len(arguments) < 2:
-            self._terminal.write('%(face-error)sWrong number of arguments!\n')
-            return
+            def invoke(self, thread, arguments, from_tty=False):
+                if len(arguments) < 2:
+                    self._terminal.write(('%(face-error)s'
+                                          'Wrong number of arguments!\n'))
+                    return
 
-        inferior = self._inferior_repository.inferior(thread.inferior_id())
-        snippet = SnippetManager().snippet(arguments[0])
-        if snippet is None:
-            self._terminal.write(' '.join(['%(face-error)sSnippet',
-                                           arguments[0],
-                                           '%s does not exist!\n']))
-            return
+                inferior_id = thread.inferior_id()
+                inferior = self._inferior_repository.inferior(inferior_id)
+                snippet = snippet_repository.snippet(arguments[0])
+                if snippet is None:
+                    self._terminal.write(' '.join(['%(face-error)sSnippet',
+                                                   arguments[0],
+                                                   '%s does not exist!\n']))
+                    return
 
-        architecture = inferior.cpu().architecture()
-        implementation = None
-        if ((architecture == Architecture.X8664 and
-             architecture not in snippet.architectures())):
-            assert Architecture.X86 in snippet.architectures()
-            implementation = snippet.implementation(Architecture.X86)
+                architecture = inferior.cpu().architecture()
+                implementation = None
+                if ((architecture == Architecture.X8664 and
+                     architecture not in snippet.architectures())):
+                    assert Architecture.X86 in snippet.architectures()
+                    implementation = snippet.implementation(Architecture.X86)
 
-        else:
-            implementation = snippet.implementation(architecture)
+                else:
+                    implementation = snippet.implementation(architecture)
 
-        address = abs(long(arguments[1]))
-        code = implementation.assemble()
-        inferior.write_memory(code, address)
+                address = abs(long(arguments[1]))
+                code = implementation.assemble()
+                inferior.write_memory(code, address)
 
-        self._terminal.write('Applied snippet %s%s%s at %s0x%x\n' %
-                             ('%(face-identifier)s', arguments[0],
-                              '%(face-normal)s', '%(face-constant)s',
-                              address))
+                self._terminal.write('Applied snippet %s%s%s at %s0x%x\n' %
+                                     ('%(face-identifier)s', arguments[0],
+                                      '%(face-normal)s', '%(face-constant)s',
+                                      address))
