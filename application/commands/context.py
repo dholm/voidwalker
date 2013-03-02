@@ -108,9 +108,6 @@ parameters'''
     def name():
         return '%s %s' % (VoidwalkerCommand.name(), 'context')
 
-    def init(self, terminal):
-        self._terminal = terminal
-
     def __init__(self):
         super(ContextCommand, self).__init__()
         self._terminal = None
@@ -120,7 +117,8 @@ parameters'''
             return
 
         inferior = InferiorManager().inferior(thread.inferior_id())
-        context = PlatformFactory().create_context(inferior, thread)
+        context = PlatformFactory().create_context(self._config, inferior,
+                                                   thread)
         previous_context = context
         if len(thread.contexts()):
             previous_context = thread.contexts()[-1]

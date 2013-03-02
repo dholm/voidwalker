@@ -77,8 +77,7 @@ class TestCommandFactory(object):
                             str(command_type))
 
 
-@singleton_implementation(ParameterFactory)
-class TestParameterFactory(object):
+class TestParameterFactory(ParameterFactory, object):
     def create_parameter(self, parameter_type):
         if issubclass(parameter_type, EnumParameter):
             class TestParameterEnum(parameter_type):

@@ -14,9 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['context',
-           'show',
-           'voidwalker']
-
-# Automatically register all parameters
-from . import *
+from .voidwalker import VoidwalkerParameter
+from .show import ShowParameter
+from .context import ContextParameter
+from .context import ContextStackParameter
+from .context import ContextInstructionsParameter

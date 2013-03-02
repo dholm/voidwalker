@@ -14,8 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import abc
+
 from ..utils.decorators import singleton
 from ..utils.decorators import singleton_specification
+
+
+_parameter_list = []
 
 
 class Parameter(object):
@@ -25,10 +30,6 @@ class Parameter(object):
     @staticmethod
     def name():
         raise NotImplementedError
-
-    @classmethod
-    def get_value(cls):
-        return ParameterManager().parameter(cls.name()).value
 
     def default_value(self):
         raise NotImplementedError
@@ -58,31 +59,22 @@ class IntegerParameter(Parameter):
         raise NotImplementedError
 
 
-@singleton_specification
 class ParameterFactory(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
     def create_parameter(self, parameter_type):
         raise NotImplementedError
 
 
-@singleton
-class ParameterManager(object):
-    def __init__(self):
-        self._parameters = {}
-        self._instances = {}
-
-    def init(self):
-        for name, Param in self._parameters.iteritems():
-            self._instances[name] = ParameterFactory().create_parameter(Param)
-            self._instances[name].init()
-
-    def add_parameter(self, parameter):
-        self._parameters[parameter.name()] = parameter
-
-    def parameter(self, name):
-        assert name in self._instances
-        return self._instances[name]
+class ParameterBuilder(object):
+    def __init__(self, factory, config):
+        for Param in _parameter_list:
+            param = factory.create_parameter(Param)
+            param.init()
+            config.register_parameter(param)
 
 
 def register_parameter(cls):
-    ParameterManager().add_parameter(cls)
+    _parameter_list.append(cls)
     return cls

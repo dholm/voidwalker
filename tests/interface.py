@@ -20,14 +20,16 @@ from flowui.themes import Solarized
 from unittest import TestCase
 
 from framework.interface.command import CommandManager
+from framework.interface.config import Configuration
 from framework.interface.parameter import BooleanParameter
 from framework.interface.parameter import EnumParameter
 from framework.interface.parameter import Parameter
-from framework.interface.parameter import ParameterManager
+from framework.interface.parameter import ParameterBuilder
 from framework.interface.parameter import register_parameter
 
 from backends.test.interface import TestCommand
 from backends.test.interface import TestDataCommand
+from backends.test.interface import TestParameterFactory
 
 
 class CommandTest(TestCase):
@@ -35,7 +37,7 @@ class CommandTest(TestCase):
         self._terminal = AnsiTerminal(SysTerminal(), Solarized())
 
     def test_command(self):
-        CommandManager().init(self._terminal)
+        CommandManager().init(Configuration(), self._terminal)
 
         self.assertIsNotNone(CommandManager().command(TestCommand.name()))
         self.assertIsNotNone(CommandManager().command(TestDataCommand.name()))
@@ -90,16 +92,18 @@ class EnumParameterTest(EnumParameter):
 
 class ParameterTest(TestCase):
     def setUp(self):
-        ParameterManager().init()
+        config = Configuration()
+        ParameterBuilder(TestParameterFactory(), config)
+        self._config = config
 
     def test_parameter(self):
         name = TestParameter.name()
-        self.assertIsNotNone(ParameterManager().parameter(name))
+        self.assertIsNotNone(self._config.parameter(name))
 
     def test_boolean_parameter(self):
         name = BooleanParameterTest.name()
-        self.assertIsNotNone(ParameterManager().parameter(name))
+        self.assertIsNotNone(self._config.parameter(name))
 
     def test_enum_parameter(self):
         name = EnumParameterTest.name()
-        self.assertIsNotNone(ParameterManager().parameter(name))
+        self.assertIsNotNone(self._config.parameter(name))

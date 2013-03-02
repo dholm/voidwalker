@@ -14,5 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['command',
-           'parameter']
+from .command import Command
+from .command import PrefixCommand
+from .command import DataCommand
+from .command import StackCommand
+from .command import BreakpointCommand
+from .command import SupportCommand
+from .command import CommandFactory
+from .command import CommandManager
+
+from .parameter import Parameter
+from .parameter import PrefixParameter
+from .parameter import BooleanParameter
+from .parameter import EnumParameter
+from .parameter import IntegerParameter
+from .parameter import ParameterFactory
+from .parameter import ParameterBuilder
+from .parameter import register_parameter
+
+from .config import Configuration

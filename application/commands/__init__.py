@@ -14,9 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['voidwalker',
-           'context',
-           'dump']
-
-# Automatically register all commands
-from . import *
+from .voidwalker import VoidwalkerCommand
+from .context import ContextCommand
+from .dump import DumpCommand
+from .dump import DumpDataCommand
+from .dump import DumpInstructionsCommand

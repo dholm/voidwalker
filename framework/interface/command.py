@@ -22,10 +22,11 @@ from ..utils.decorators import singleton_specification
 
 class Command(object):
     def __init__(self):
+        self._config = None
         self._terminal = None
-        self._theme = None
 
-    def init(self, terminal):
+    def init(self, config, terminal):
+        self._config = config
         self._terminal = terminal
 
 
@@ -67,10 +68,10 @@ class CommandManager(object):
         self._commands = OrderedDict()
         self._instances = {}
 
-    def init(self, terminal):
+    def init(self, config, terminal):
         for name, Cmd in self._commands.iteritems():
             self._instances[name] = CommandFactory().create_command(Cmd)
-            self._instances[name].init(terminal)
+            self._instances[name].init(config, terminal)
 
     def commands(self):
         return self._commands.iteritems()

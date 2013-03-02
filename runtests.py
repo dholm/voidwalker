@@ -19,21 +19,8 @@
 import sys
 import unittest
 
-from framework.interface.parameter import ParameterFactory
-from framework.interface.parameter import ParameterManager
-from framework.utils.decorators import singleton_implementation
-
 import tests
 
-
-@singleton_implementation(ParameterFactory)
-class TestParameterFactory(object):
-    def create_parameter(self, parameter_type):
-        parameter = parameter_type()
-        parameter.value = parameter.default_value()
-        return parameter
-
-ParameterManager().init()
 
 suite = tests.suite()
 runner = unittest.TextTestRunner(verbosity=2)

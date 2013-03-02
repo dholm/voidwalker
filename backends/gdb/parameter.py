@@ -22,7 +22,6 @@ from framework.interface.parameter import IntegerParameter
 from framework.interface.parameter import Parameter
 from framework.interface.parameter import ParameterFactory
 from framework.interface.parameter import PrefixParameter
-from framework.utils.decorators import singleton_implementation
 
 
 class GdbBaseParameter(gdb.Parameter, object):
@@ -39,8 +38,7 @@ class GdbBaseParameter(gdb.Parameter, object):
         return value
 
 
-@singleton_implementation(ParameterFactory)
-class GdbParameterFactory(object):
+class GdbParameterFactory(ParameterFactory, object):
     def create_parameter(self, parameter_type):
         if issubclass(parameter_type, EnumParameter):
             class GdbParameterEnum(GdbBaseParameter, parameter_type):

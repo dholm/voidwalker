@@ -58,14 +58,12 @@ class GdbPlatformFactory(object):
 
         return GdbRegister(register.name())
 
-    def create_context(self, inferior, thread):
+    def create_context(self, config, inferior, thread):
+        stackdws = config.parameter(ContextStackParameter.name()).value()
+        instrs_name = ContextInstructionsParameter.name()
+        instructions = config.parameter(instrs_name).value()
+
         class GdbContext(Context):
-            def _param_stackdw(self):
-                return ContextStackParameter.get_value()
-
-            def _param_instructions(self):
-                return ContextInstructionsParameter.get_value()
-
             def _update_registers(self):
                 for group, register_dict in inferior.cpu().registers():
                     tuples = [(x.name(), create_static_register(x))
@@ -74,14 +72,14 @@ class GdbPlatformFactory(object):
                     self._registers[group] = register_dict
 
             def _update_stack(self):
-                size = self._param_stackdw() * 0x8
+                size = stackdws * 0x8
                 address = inferior.cpu().stack_pointer().value() & ~0xf
                 stack = inferior.read_memory(address, size)
                 self._stack = DataChunk(address, stack)
 
             def _update_instructions(self):
                 address = inferior.cpu().program_counter().value()
-                length = self._param_instructions()
+                length = instructions
                 listing = inferior.disassemble(address, length)
                 self._instruction_listing = listing
 
