@@ -16,6 +16,8 @@
 
 import gdb
 
+from functools import partial
+
 from framework.interface import BreakpointCommand
 from framework.interface import Command
 from framework.interface import CommandFactory
@@ -62,7 +64,8 @@ def parse_argument_list(argument):
 
 
 class GdbCommandFactory(CommandFactory, object):
-    def create_data_command(self, command_type, terminal):
+    def create_data_command(self, command_type, terminal, inferior_repo,
+                            target_factory):
         class GdbDataCommand(gdb.Command, command_type):
             __doc__ = command_type.__doc__
 
@@ -72,14 +75,15 @@ class GdbCommandFactory(CommandFactory, object):
                                      gdb.COMMAND_DATA, gdb.COMPLETE_NONE)
 
             def invoke(self, argument, _):
-                thread = get_current_thread()
+                thread = get_current_thread(inferior_repo, target_factory)
                 if thread is not None:
                     args = parse_argument_list(argument)
                     command_type.execute(self, terminal, thread, args)
 
         return GdbDataCommand()
 
-    def create_stack_command(self, command_type, terminal):
+    def create_stack_command(self, command_type, config, terminal,
+                             inferior_repo, platform_factory, target_factory):
         class GdbStackCommand(gdb.Command, command_type):
             __doc__ = command_type.__doc__
 
@@ -89,10 +93,11 @@ class GdbCommandFactory(CommandFactory, object):
                                      gdb.COMMAND_STACK, gdb.COMPLETE_NONE)
 
             def invoke(self, argument, _):
-                thread = get_current_thread()
+                thread = get_current_thread(inferior_repo, target_factory)
                 if thread is not None:
                     args = parse_argument_list(argument)
-                    command_type.execute(self, terminal, thread, args)
+                    command_type.execute(self, config, terminal, thread,
+                                         inferior_repo, platform_factory, args)
 
         return GdbStackCommand()
 
@@ -124,7 +129,7 @@ class GdbCommandFactory(CommandFactory, object):
 
         return GdbSupportCommand()
 
-    def create_breakpoint_command(self, command_type, terminal):
+    def create_brkp_command(self, command_type, terminal, inferior_repo):
         class GdbBreakpointCommand(gdb.Command, command_type):
             def __init__(self):
                 command_type.__init__(self)
@@ -133,14 +138,14 @@ class GdbCommandFactory(CommandFactory, object):
                                      gdb.COMPLETE_NONE)
 
             def invoke(self, argument, _):
-                inferior = get_current_inferior()
+                inferior = get_current_inferior(inferior_repo)
                 if inferior is not None:
                     args = parse_argument_list(argument)
                     command_type.execute(self, terminal, inferior, args)
 
         return GdbBreakpointCommand()
 
-    def create_generic_command(self, command_type, _):
+    def create_generic_command(self, command_type):
         class GdbCommand(gdb.Command, command_type):
             __doc__ = command_type.__doc__
 
@@ -152,16 +157,29 @@ class GdbCommandFactory(CommandFactory, object):
 
         return GdbCommand()
 
-    def create(self, command_type, terminal):
-        create_method = [(DataCommand, self.create_data_command),
-                         (StackCommand, self.create_stack_command),
-                         (PrefixCommand, self.create_prefix_command),
-                         (SupportCommand, self.create_support_command),
-                         (BreakpointCommand, self.create_breakpoint_command),
-                         (Command, self.create_generic_command)]
+    def create(self, command_type, inferior_repository, platform_factory,
+               target_factory, config, terminal):
+        create_method = [(DataCommand, partial(self.create_data_command,
+                                               command_type, terminal,
+                                               inferior_repository,
+                                               target_factory)),
+                         (StackCommand, partial(self.create_stack_command,
+                                                command_type, config, terminal,
+                                                inferior_repository,
+                                                platform_factory,
+                                                target_factory)),
+                         (PrefixCommand, partial(self.create_prefix_command,
+                                                 command_type, terminal)),
+                         (SupportCommand, partial(self.create_support_command,
+                                                  command_type, terminal)),
+                         (BreakpointCommand, partial(self.create_brkp_command,
+                                                     command_type, terminal,
+                                                     inferior_repository)),
+                         (Command, partial(self.create_generic_command,
+                                           command_type))]
         for ctype, create in create_method:
             if issubclass(command_type, ctype):
-                return create(command_type, terminal)
+                return create()
         else:
             raise TypeError('Command %s of type %s unknown!' %
                             (command_type.name(), repr(command_type)))

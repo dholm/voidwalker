@@ -25,14 +25,6 @@ voidwalker_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 sys.path.append(os.path.dirname(voidwalker_path))
 
 
-# Load GDB backend
-from backends.gdb import *
-
-# Register all commands, parameters, cpus and themes
-from application import *
-from application.patching import *
-from backends.gdb.tools import *
-
 from framework.interface import CommandBuilder
 from framework.interface import Configuration
 from framework.interface import ParameterBuilder
@@ -48,15 +40,17 @@ from backends.gdb import GdbTerminal
 
 from application.patching import SnippetCommandBuilder
 
+# Register all commands, parameters, cpus and themes
+import backends.gdb.tools
+import application
+
 from version import __version__
 
 
 class VoidwalkerBuilder(object):
     def __init__(self, version):
-        event_queue = GdbEventQueue()
-
         config = Configuration()
-        ParameterBuilder(config, GdbParameterFactory())
+        ParameterBuilder(GdbParameterFactory(), config)
 
         snippet_repository = SnippetRepository()
         SnippetCommandBuilder(snippet_repository)
@@ -65,8 +59,8 @@ class VoidwalkerBuilder(object):
         target_factory = GdbTargetFactory(CpuFactory(platform_factory))
         inferior_repository = InferiorRepository(target_factory)
         ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
-        CommandBuilder(GdbCommandFactory(), inferior_repository, platform_factory,
-                       target_factory, config, ansi_terminal)
+        CommandBuilder(GdbCommandFactory(), inferior_repository,
+                       platform_factory, target_factory, config, ansi_terminal)
 
         ansi_terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
                              'v%(version)s installed\n'),

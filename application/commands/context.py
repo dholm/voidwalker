@@ -110,13 +110,13 @@ parameters'''
     def __init__(self):
         super(ContextCommand, self).__init__()
 
-    def execute(self, terminal, thread, argument):
+    def execute(self, config, terminal, thread, inferior_repository,
+                platform_factory, argument):
         if not thread.is_valid():
             return
 
-        inferior = self._inferior_repository.inferior(thread.inferior_id())
-        context = self._platform_factory.create_context(self._config, inferior,
-                                                        thread)
+        inferior = inferior_repository.inferior(thread.inferior_id())
+        context = platform_factory.create_context(config, inferior, thread)
         previous_context = context
         if len(thread.contexts()):
             previous_context = thread.contexts()[-1]

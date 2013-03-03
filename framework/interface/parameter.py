@@ -72,14 +72,14 @@ class ParameterFactory(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def create_parameter(self, parameter_type):
+    def create(self, parameter_type):
         raise NotImplementedError
 
 
 class ParameterBuilder(object):
     def __init__(self, factory, config):
         for Param in _parameter_list:
-            param = factory.create_parameter(Param)
+            param = factory.create(Param)
             param.init()
             config.register_parameter(param)
 

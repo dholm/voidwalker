@@ -20,13 +20,13 @@ from flowui.themes import Solarized
 from unittest import TestCase
 
 from framework.interface import BooleanParameter
-from framework.interface import Command
 from framework.interface import CommandBuilder
 from framework.interface import Configuration
 from framework.interface import DataCommand
 from framework.interface import EnumParameter
 from framework.interface import Parameter
 from framework.interface import ParameterBuilder
+from framework.interface import PrefixCommand
 from framework.interface import register_command
 from framework.interface import register_parameter
 from framework.platform import CpuFactory
@@ -39,7 +39,7 @@ from backends.test import TestTargetFactory
 
 
 @register_command
-class TestCommand(Command):
+class TestCommand(PrefixCommand):
     @staticmethod
     def name():
         return 'test'
@@ -50,6 +50,9 @@ class TestDataCommand(DataCommand):
     @staticmethod
     def name():
         return '%s %s' % (TestCommand.name(), 'data')
+
+    def execute(self, terminal, thread, argument):
+        pass
 
 
 class CommandTest(TestCase):
@@ -132,4 +135,3 @@ class ParameterTest(TestCase):
     def test_enum_parameter(self):
         name = EnumParameterTest.name()
         self.assertIsNotNone(self._config.parameter(name))
-

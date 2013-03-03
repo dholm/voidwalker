@@ -23,10 +23,12 @@ from framework.interface import Parameter
 from framework.interface import ParameterFactory
 
 from .target import TestInferior
+from .target import TestThread
 
 
 class TestCommandFactory(CommandFactory, object):
-    def create(self, command_type):
+    def create(self, command_type, inferior_repository, platform_factory,
+               target_factory, config, terminal):
         if issubclass(command_type, DataCommand):
             class TestDataCommand(command_type):
                 __doc__ = command_type.__doc__
@@ -36,7 +38,8 @@ class TestCommandFactory(CommandFactory, object):
 
                 def invoke(self, argument, _):
                     inferior = TestInferior()
-                    command_type.execute(self, terminal, inferior, argument)
+                    thread = TestThread(inferior.id(), 0)
+                    command_type.execute(self, terminal, thread, argument)
 
             return TestDataCommand()
 
@@ -48,8 +51,7 @@ class TestCommandFactory(CommandFactory, object):
                     command_type.__init__(self)
 
                 def invoke(self, argument, _):
-                    inferior = TestInferior()
-                    command_type.invoke(self, inferior, argument)
+                    command_type.execute(self, terminal, argument)
 
             return TestCommand()
 

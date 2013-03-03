@@ -18,28 +18,13 @@ import abc
 
 
 class Command(object):
-    def __init__(self):
-        self._inferior_repository = None
-        self._target_factory = None
-        self._config = None
-        self._terminal = None
-
-    def init(self, inferior_repository, platform_factory, target_factory,
-             config, terminal):
-        self._platform_factory = platform_factory
-        self._inferior_repository = inferior_repository
-        self._target_factory = target_factory
-        self._config = config
-        self._terminal = terminal
+    pass
 
 
 class PrefixCommand(Command):
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def execute(self, *_):
-        self._terminal.write('%(face-error)sAttempting to invoke an '
-                             'incomplete command!\n')
+    def execute(self, terminal):
+        terminal.write('%(face-error)sAttempting to invoke an '
+                       'incomplete command!\n')
 
 
 class DataCommand(Command):
@@ -54,7 +39,8 @@ class StackCommand(Command):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def execute(self, terminal, thread, argument):
+    def execute(self, config, terminal, thread, inferior_repository,
+                platform_factory, argument):
         raise NotImplementedError
 
 
@@ -78,7 +64,8 @@ class CommandFactory(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def create(self, command_type):
+    def create(self, command_type, inferior_repository, platform_factory,
+               target_factory, config, terminal):
         raise NotImplementedError
 
 
@@ -92,9 +79,9 @@ class CommandBuilder(object):
                                          config, terminal)
             self.commands[Cmd.name()] = cmd
 
+
 def register_command(cls):
     _command_list.append(cls)
     return cls
 
 _command_list = []
-

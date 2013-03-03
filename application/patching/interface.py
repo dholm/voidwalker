@@ -65,7 +65,7 @@ class SnippetCommandBuilder(object):
             def __init__(self):
                 super(ListSnippetsCommand, self).__init__()
 
-            def invoke(self, *_):
+            def execute(self, terminal, *_):
                 table = Table()
                 for name, snippet in snippet_repository.snippets():
                     row = Row()
@@ -76,7 +76,7 @@ class SnippetCommandBuilder(object):
 
                 section = Section('snippets')
                 section.add_component(table)
-                section.draw(self._terminal, self._terminal.width())
+                section.draw(terminal, terminal.width())
 
         @register_command
         class ApplySnippetCommand(StackCommand):
@@ -93,19 +93,20 @@ touched by this command.'''
             def __init__(self):
                 super(ApplySnippetCommand, self).__init__()
 
-            def invoke(self, thread, arguments, from_tty=False):
+            def execute(self, _config, terminal, thread, inferior_repo,
+                        _platform_factory, arguments):
                 if len(arguments) < 2:
-                    self._terminal.write(('%(face-error)s'
-                                          'Wrong number of arguments!\n'))
+                    terminal.write('%(face-error)s'
+                                   'Wrong number of arguments!\n')
                     return
 
                 inferior_id = thread.inferior_id()
-                inferior = self._inferior_repository.inferior(inferior_id)
+                inferior = inferior_repo.inferior(inferior_id)
                 snippet = snippet_repository.snippet(arguments[0])
                 if snippet is None:
-                    self._terminal.write(' '.join(['%(face-error)sSnippet',
-                                                   arguments[0],
-                                                   '%s does not exist!\n']))
+                    terminal.write(' '.join(['%(face-error)sSnippet',
+                                             arguments[0],
+                                             '%s does not exist!\n']))
                     return
 
                 architecture = inferior.cpu().architecture()
@@ -122,7 +123,7 @@ touched by this command.'''
                 code = implementation.assemble()
                 inferior.write_memory(code, address)
 
-                self._terminal.write('Applied snippet %s%s%s at %s0x%x\n' %
-                                     ('%(face-identifier)s', arguments[0],
-                                      '%(face-normal)s', '%(face-constant)s',
-                                      address))
+                terminal.write('Applied snippet %s%s%s at %s0x%x\n' %
+                               ('%(face-identifier)s', arguments[0],
+                                '%(face-normal)s', '%(face-constant)s',
+                                address))
