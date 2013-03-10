@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .factory import TargetFactory
 from .inferior import Inferior
+from .inferior import InferiorFactory
 from .inferior import InferiorRepository
 from .thread import Thread
+from .thread import ThreadFactory

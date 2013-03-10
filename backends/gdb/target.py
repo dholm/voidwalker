@@ -1,5 +1,5 @@
 # (void)walker GDB backend
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,16 +19,17 @@ import os.path
 import re
 
 from framework.platform import Architecture
-from framework.target.factory import TargetFactory
 from framework.target.inferior import Inferior
+from framework.target.inferior import InferiorFactory
 from framework.target.thread import Thread
+from framework.target.thread import ThreadFactory
 from framework.types.instructions import Instruction
 from framework.types.instructions import InstructionListing
 
 
 class GdbThread(Thread):
-    def __init__(self, inferior_id, gdb_thread):
-        super(GdbThread, self).__init__(inferior_id)
+    def __init__(self, inferior, gdb_thread):
+        super(GdbThread, self).__init__(inferior)
         self._gdb_thread = gdb_thread
 
     def name(self):
@@ -91,7 +92,7 @@ class GdbInferior(Inferior):
         self._gdb_inferior.write_memory(address, buf)
 
 
-class GdbTargetFactory(TargetFactory, object):
+class GdbInferiorFactory(InferiorFactory, object):
     _file_expression = re.compile((r'`(?P<path>[^\']+)\', '
                                    r'file type (?P<target>\S+).'))
     _inferior_expression = re.compile((r'(?P<num>\d+)\s+'
@@ -99,10 +100,10 @@ class GdbTargetFactory(TargetFactory, object):
                                        r'(?P<path>.+)$'))
 
     def __init__(self, cpu_factory):
-        self._cpu_factory = cpu_factory
+        super(GdbInferiorFactory, self).__init__(cpu_factory)
 
-    @staticmethod
-    def _target_to_architecture(target):
+    @classmethod
+    def _target_to_architecture(cls, target):
         if re.match(r'.*-x86-64', target):
             return Architecture.X8664
         if re.match(r'.*-i386', target):
@@ -134,19 +135,21 @@ class GdbTargetFactory(TargetFactory, object):
                       if os.path.abspath(i[0]).strip() == inferior_path).next()
 
             architecture = self._target_to_architecture(target)
-            cpu = self._cpu_factory.create(architecture)
+            cpu = self._cpu_factory.create_cpu(architecture)
 
         except TypeError:
             return None
 
         return GdbInferior(cpu, gdb_inferior)
 
+
+class GdbThreadFactory(ThreadFactory, object):
     def create_thread(self, inferior, thread_id):
         gdb_thread = None
         try:
             gdb_thread = (i for i in inferior.gdb_inferior().threads()
                           if i.num == thread_id).next()
-            thread = GdbThread(inferior.id(), gdb_thread)
+            thread = GdbThread(inferior, gdb_thread)
             inferior.add_thread(thread)
             return thread
 
@@ -154,3 +157,4 @@ class GdbTargetFactory(TargetFactory, object):
             pass
 
         return None
+

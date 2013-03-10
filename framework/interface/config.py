@@ -40,7 +40,7 @@ class ConfigurationNode(object):
         self._children[name] = node
 
     def value(self):
-        return self._parameter.value
+        return self._parameter.get_value()
 
     def get(self, name):
         assert name in self._children

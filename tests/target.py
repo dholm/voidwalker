@@ -20,28 +20,38 @@ from framework.platform import CpuFactory
 from framework.target import InferiorRepository
 
 from backends.test import TestPlatformFactory
-from backends.test import TestTargetFactory
+from backends.test import TestThreadFactory
+from backends.test import TestInferiorFactory
 
-from .platform import TestCpu
+from backends.test.platform import TestCpuFactory
+from backends.test.target import TestInferiorFactory
+from backends.test.target import TestThreadFactory
 
 
 class InferiorTest(TestCase):
     def setUp(self):
-        self._platform_factory = TestPlatformFactory()
-        target_factory = TestTargetFactory(CpuFactory(self._platform_factory))
-        target_factory.create_inferior(0)
-        self._inferior_repository = InferiorRepository(target_factory)
-        inferior = self._inferior_repository.inferior(0)
-        target_factory.create_thread(inferior, 0)
+        cpu_factory = TestCpuFactory()
+        self._cpu = cpu_factory.create_cpu(None)
+
+    def test_inferior_repository(self):
+        inferior_repository = InferiorRepository()
+        self.assertFalse(inferior_repository.has_inferior(0))
 
     def test_inferior(self):
-        inferior = self._inferior_repository.inferior(0)
+        inferior_factory = TestInferiorFactory()
+        inferior = inferior_factory.create_inferior(self._cpu, 0)
+
         self.assertEqual(0, inferior.id())
         self.assertEqual(inferior.cpu().architecture(),
-                         TestCpu(self._platform_factory).architecture())
+                         self._cpu.architecture())
 
     def test_thread(self):
-        inferior = self._inferior_repository.inferior(0)
+        inferior_factory = TestInferiorFactory()
+        inferior = inferior_factory.create_inferior(self._cpu, 0)
+        thread_factory = TestThreadFactory()
+        thread = thread_factory.create_thread(inferior, 0)
+        inferior.add_thread(thread)
+
         self.assertTrue(inferior.has_thread(0))
         thread = inferior.thread(0)
         self.assertEqual(0, thread.id())

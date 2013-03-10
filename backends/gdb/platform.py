@@ -1,5 +1,5 @@
 # (void)walker GDB backend
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ import gdb
 import re
 
 from framework.platform import Context
+from framework.platform import CpuFactory
 from framework.platform import PlatformFactory
 from framework.platform import create_static_register
 from framework.types import DataChunk
@@ -27,8 +28,8 @@ from application.parameters.context import ContextInstructionsParameter
 from application.parameters.context import ContextStackParameter
 
 
-class GdbPlatformFactory(PlatformFactory, object):
-    def create_register(self, register):
+class GdbCpuFactory(CpuFactory, object):
+    def create_register(self, cpu, register):
         class GdbRegister(type(register), object):
             _value_exp = re.compile(r'(?P<variable>.+)\s*=\s*(?P<value>.+)')
 
@@ -56,10 +57,13 @@ class GdbPlatformFactory(PlatformFactory, object):
 
         return GdbRegister(register.name())
 
-    def create_context(self, config, inferior, thread):
+
+class GdbPlatformFactory(PlatformFactory, object):
+    def create_context(self, config, thread):
         stackdws = config.parameter(ContextStackParameter.name()).value()
         instrs_name = ContextInstructionsParameter.name()
         instructions = config.parameter(instrs_name).value()
+        inferior = thread.get_inferior()
 
         class GdbContext(Context):
             def _update_registers(self):

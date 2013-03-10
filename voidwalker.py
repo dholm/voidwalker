@@ -1,5 +1,5 @@
 # (void)walker GDB plugin
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,9 +33,11 @@ from framework.platform import CpuFactory
 from framework.target import InferiorRepository
 
 from backends.gdb import GdbCommandFactory
+from backends.gdb import GdbCpuFactory
 from backends.gdb import GdbParameterFactory
 from backends.gdb import GdbPlatformFactory
-from backends.gdb import GdbTargetFactory
+from backends.gdb import GdbInferiorFactory
+from backends.gdb import GdbThreadFactory
 from backends.gdb import GdbTerminal
 
 from application.patching import SnippetCommandBuilder
@@ -56,11 +58,12 @@ class VoidwalkerBuilder(object):
         SnippetCommandBuilder(snippet_repository)
 
         platform_factory = GdbPlatformFactory()
-        target_factory = GdbTargetFactory(CpuFactory(platform_factory))
-        inferior_repository = InferiorRepository(target_factory)
+        inferior_factory = GdbInferiorFactory(GdbCpuFactory())
+        inferior_repository = InferiorRepository()
         ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
         CommandBuilder(GdbCommandFactory(), inferior_repository,
-                       platform_factory, target_factory, config, ansi_terminal)
+                       platform_factory, inferior_factory, GdbThreadFactory(),
+                       config, ansi_terminal)
 
         ansi_terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
                              'v%(version)s installed\n'),

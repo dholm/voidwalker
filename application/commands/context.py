@@ -1,5 +1,5 @@
 # (void)walker command interface
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -110,13 +110,11 @@ parameters'''
     def __init__(self):
         super(ContextCommand, self).__init__()
 
-    def execute(self, config, terminal, thread, inferior_repository,
-                platform_factory, argument):
+    def execute(self, config, terminal, thread, platform_factory, argument):
         if not thread.is_valid():
             return
 
-        inferior = inferior_repository.inferior(thread.inferior_id())
-        context = platform_factory.create_context(config, inferior, thread)
+        context = platform_factory.create_context(config, thread)
         previous_context = context
         if len(thread.contexts()):
             previous_context = thread.contexts()[-1]

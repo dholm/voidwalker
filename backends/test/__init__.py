@@ -15,10 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .platform import TestCpu
+from .platform import TestCpuFactory
 from .platform import TestPlatformFactory
 from .target import TestThread
+from .target import TestThreadFactory
 from .target import TestInferior
-from .target import TestTargetFactory
+from .target import TestInferiorFactory
 
 from .interface import TestCommandFactory
 from .interface import TestParameterFactory

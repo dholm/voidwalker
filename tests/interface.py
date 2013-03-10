@@ -33,9 +33,10 @@ from framework.platform import CpuFactory
 from framework.target import InferiorRepository
 
 from backends.test import TestCommandFactory
+from backends.test import TestInferiorFactory
 from backends.test import TestParameterFactory
 from backends.test import TestPlatformFactory
-from backends.test import TestTargetFactory
+from backends.test import TestThreadFactory
 
 
 @register_command
@@ -60,12 +61,12 @@ class CommandTest(TestCase):
         self._terminal = AnsiTerminal(SysTerminal(), Solarized())
 
     def test_command(self):
-        platform_factory = TestPlatformFactory()
-        target_factory = TestTargetFactory(CpuFactory(platform_factory))
-        inferior_repository = InferiorRepository(target_factory)
+        inferior_factory = TestInferiorFactory()
+        thread_factory = TestThreadFactory()
+        inferior_repository = InferiorRepository()
         bldr = CommandBuilder(TestCommandFactory(), inferior_repository,
-                              platform_factory, target_factory,
-                              Configuration(), self._terminal)
+                              TestPlatformFactory(), inferior_factory,
+                              thread_factory, Configuration(), self._terminal)
 
         self.assertIn(TestCommand.name(), bldr.commands)
         self.assertIn(TestDataCommand.name(), bldr.commands)

@@ -54,17 +54,28 @@ class Inferior(object):
         raise NotImplementedError
 
 
+class InferiorFactory(object):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, cpu_factory):
+        self._cpu_factory = cpu_factory
+
+    @abc.abstractmethod
+    def create_inferior(self, inferior_id):
+        raise NotImplementedError
+
+
 class InferiorRepository(object):
-    def __init__(self, target_factory):
-        self._target_factory = target_factory
+    def __init__(self):
         self._inferiors = {}
 
     def add_inferior(self, inferior):
         self._inferiors[inferior.id()] = inferior
 
-    def inferior(self, inferior_id):
-        if inferior_id in self._inferiors:
-            return self._inferiors[inferior_id]
-        inferior = self._target_factory.create_inferior(inferior_id)
-        self.add_inferior(inferior)
-        return inferior
+    def has_inferior(self, inferior_id):
+        return inferior_id in self._inferiors
+
+    def get_inferior(self, inferior_id):
+        assert self.has_inferior(inferior_id), ('inferior %r not found' %
+                                                inferior_id)
+        return self._inferiors[inferior_id]

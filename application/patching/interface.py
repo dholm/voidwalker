@@ -1,5 +1,5 @@
 # (void)walker code patching interface
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -93,19 +93,18 @@ touched by this command.'''
             def __init__(self):
                 super(ApplySnippetCommand, self).__init__()
 
-            def execute(self, _config, terminal, thread, inferior_repo,
-                        _platform_factory, arguments):
-                if len(arguments) < 2:
+            def execute(self, config, terminal, thread, platform_factory,
+                        argument):
+                if len(argument) < 2:
                     terminal.write('%(face-error)s'
                                    'Wrong number of arguments!\n')
                     return
 
-                inferior_id = thread.inferior_id()
-                inferior = inferior_repo.inferior(inferior_id)
-                snippet = snippet_repository.snippet(arguments[0])
+                inferior = thread.get_inferior()
+                snippet = snippet_repository.snippet(argument[0])
                 if snippet is None:
                     terminal.write(' '.join(['%(face-error)sSnippet',
-                                             arguments[0],
+                                             argument[0],
                                              '%s does not exist!\n']))
                     return
 
@@ -119,11 +118,11 @@ touched by this command.'''
                 else:
                     implementation = snippet.implementation(architecture)
 
-                address = abs(long(arguments[1]))
+                address = abs(long(argument[1]))
                 code = implementation.assemble()
                 inferior.write_memory(code, address)
 
                 terminal.write('Applied snippet %s%s%s at %s0x%x\n' %
-                               ('%(face-identifier)s', arguments[0],
+                               ('%(face-identifier)s', argument[0],
                                 '%(face-normal)s', '%(face-constant)s',
                                 address))

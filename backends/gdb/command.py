@@ -1,5 +1,5 @@
 # (void)walker GDB backend
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,23 +27,23 @@ from framework.interface import StackCommand
 from framework.interface import SupportCommand
 
 
-def get_current_inferior(inferior_repository):
+def get_current_inferior(inferior_repository, inferior_factory):
     inferior_num = gdb.selected_inferior().num
-    inferior = inferior_repository.inferior(inferior_num)
-    if not inferior:
-        raise gdb.GdbError(('Inferior %d does not exist!' %
-                            inferior_num))
+    if not inferior_repository.has_inferior(inferior_num):
+        inferior = inferior_factory.create_inferior(inferior_num)
+        inferior_repository.add_inferior(inferior)
 
-    return inferior
+    return inferior_repository.get_inferior(inferior_num)
 
 
-def get_current_thread(inferior_repository, target_factory):
+def get_current_thread(inferior_repository, inferior_factory,
+                       thread_factory):
     if gdb.selected_thread() is not None:
         thread_num = gdb.selected_thread().num
 
-        inferior = get_current_inferior(inferior_repository)
+        inferior = get_current_inferior(inferior_repository, inferior_factory)
         if not inferior.has_thread(thread_num):
-            target_factory.create_thread(inferior, thread_num)
+            thread_factory.create_thread(inferior, thread_num)
 
         if inferior.has_thread(thread_num):
             return inferior.thread(thread_num)
@@ -65,7 +65,7 @@ def parse_argument_list(argument):
 
 class GdbCommandFactory(CommandFactory, object):
     def create_data_command(self, command_type, terminal, inferior_repo,
-                            target_factory):
+                            inferior_factory, thread_factory):
         class GdbDataCommand(gdb.Command, command_type):
             __doc__ = command_type.__doc__
 
@@ -75,7 +75,8 @@ class GdbCommandFactory(CommandFactory, object):
                                      gdb.COMMAND_DATA, gdb.COMPLETE_NONE)
 
             def invoke(self, argument, _):
-                thread = get_current_thread(inferior_repo, target_factory)
+                thread = get_current_thread(inferior_repo, inferior_factory,
+                                            thread_factory)
                 if thread is not None:
                     args = parse_argument_list(argument)
                     command_type.execute(self, terminal, thread, args)
@@ -83,7 +84,8 @@ class GdbCommandFactory(CommandFactory, object):
         return GdbDataCommand()
 
     def create_stack_command(self, command_type, config, terminal,
-                             inferior_repo, platform_factory, target_factory):
+                             inferior_repo, platform_factory, inferior_factory,
+                             thread_factory):
         class GdbStackCommand(gdb.Command, command_type):
             __doc__ = command_type.__doc__
 
@@ -93,11 +95,12 @@ class GdbCommandFactory(CommandFactory, object):
                                      gdb.COMMAND_STACK, gdb.COMPLETE_NONE)
 
             def invoke(self, argument, _):
-                thread = get_current_thread(inferior_repo, target_factory)
+                thread = get_current_thread(inferior_repo, inferior_factory,
+                                            thread_factory)
                 if thread is not None:
                     args = parse_argument_list(argument)
                     command_type.execute(self, config, terminal, thread,
-                                         inferior_repo, platform_factory, args)
+                                         platform_factory, args)
 
         return GdbStackCommand()
 
@@ -158,16 +161,18 @@ class GdbCommandFactory(CommandFactory, object):
         return GdbCommand()
 
     def create(self, command_type, inferior_repository, platform_factory,
-               target_factory, config, terminal):
+               inferior_factory, thread_factory, config, terminal):
         create_method = [(DataCommand, partial(self.create_data_command,
                                                command_type, terminal,
                                                inferior_repository,
-                                               target_factory)),
+                                               inferior_factory,
+                                               thread_factory)),
                          (StackCommand, partial(self.create_stack_command,
                                                 command_type, config, terminal,
                                                 inferior_repository,
                                                 platform_factory,
-                                                target_factory)),
+                                                inferior_factory,
+                                                thread_factory)),
                          (PrefixCommand, partial(self.create_prefix_command,
                                                  command_type, terminal)),
                          (SupportCommand, partial(self.create_support_command,

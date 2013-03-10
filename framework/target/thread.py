@@ -1,5 +1,5 @@
 # (void)walker target support
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,25 +14,40 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import abc
+
 from collections import deque
 
 
 class Thread(object):
-    def __init__(self, inferior_id):
-        self._inferior_id = inferior_id
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, inferior):
+        self._inferior = inferior
         self._contexts = deque()
 
-    def name(self):
-        raise NotImplementedError
-
-    def id(self):
-        raise NotImplementedError
-
-    def is_valid(self):
-        raise NotImplementedError
-
-    def inferior_id(self):
-        return self._inferior_id
+    def get_inferior(self):
+        return self._inferior
 
     def contexts(self):
         return self._contexts
+
+    @abc.abstractmethod
+    def name(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def id(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def is_valid(self):
+        raise NotImplementedError
+
+
+class ThreadFactory(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def create_thread(self, inferior, thread_id):
+        raise NotImplementedError

@@ -28,7 +28,7 @@ from .target import TestThread
 
 class TestCommandFactory(CommandFactory, object):
     def create(self, command_type, inferior_repository, platform_factory,
-               target_factory, config, terminal):
+               inferior_factory, thread_factory, config, terminal):
         if issubclass(command_type, DataCommand):
             class TestDataCommand(command_type):
                 __doc__ = command_type.__doc__

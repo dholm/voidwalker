@@ -59,15 +59,15 @@ class X86Cpu(Cpu):
                                       'st7').split()),
                               ('sp', ('cs ss ds es fs gs eip').split())])
 
-    def __init__(self, platform_factory):
+    def __init__(self, cpu_factory):
         registers = OrderedDict()
         for group, register_list in self._registers.iteritems():
             registers[group] = [Register(x) for x in register_list]
         registers['sp'].append(EflagsRegister('eflags'))
-        super(X86Cpu, self).__init__(platform_factory, registers)
+        super(X86Cpu, self).__init__(cpu_factory, registers)
 
-    @staticmethod
-    def architecture():
+    @classmethod
+    def architecture(cls):
         return Architecture.X86
 
     def stack_pointer(self):

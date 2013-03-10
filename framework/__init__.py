@@ -1,5 +1,5 @@
 # (void)walker framework
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ['utils',
-           'target',
-           'interface',
-           'platform',
-           'patching']
+import framework.utils
+import framework.target
+import framework.interface
+import framework.platform
+import framework.patching
+

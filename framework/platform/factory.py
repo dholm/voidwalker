@@ -21,9 +21,5 @@ class PlatformFactory(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def create_register(self, register):
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def create_context(self, config, inferior, thread):
+    def create_context(self, config, thread):
         raise NotImplementedError

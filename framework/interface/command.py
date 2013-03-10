@@ -39,8 +39,7 @@ class StackCommand(Command):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def execute(self, config, terminal, thread, inferior_repository,
-                platform_factory, argument):
+    def execute(self, config, terminal, thread, platform_factory, argument):
         raise NotImplementedError
 
 
@@ -65,18 +64,18 @@ class CommandFactory(object):
 
     @abc.abstractmethod
     def create(self, command_type, inferior_repository, platform_factory,
-               target_factory, config, terminal):
+               inferior_factory, thread_factory, config, terminal):
         raise NotImplementedError
 
 
 class CommandBuilder(object):
     def __init__(self, command_factory, inferior_repository, platform_factory,
-                 target_factory, config, terminal):
+                 inferior_factory, thread_factory, config, terminal):
         self.commands = {}
         for Cmd in _command_list:
             cmd = command_factory.create(Cmd, inferior_repository,
-                                         platform_factory, target_factory,
-                                         config, terminal)
+                                         platform_factory, inferior_factory,
+                                         thread_factory, config, terminal)
             self.commands[Cmd.name()] = cmd
 
 

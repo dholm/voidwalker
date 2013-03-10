@@ -1,5 +1,5 @@
 # (void)walker hardware platform support
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,18 +71,18 @@ def create_static_register(register):
 class Cpu(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, platform_factory, registers):
+    def __init__(self, cpu_factory, registers):
         self._registers = OrderedDict()
         for group, register_list in registers.iteritems():
             registers = OrderedDict([(x.name(),
-                                      platform_factory.create_register(x))
+                                      cpu_factory.create_register(self, x))
                                      for x in register_list])
 
             self._registers[group] = registers
 
-    @staticmethod
+    @classmethod
     @abc.abstractmethod
-    def architecture():
+    def architecture(cls):
         raise NotImplementedError
 
     def register(self, name):
@@ -105,17 +105,33 @@ class Cpu(object):
 
 
 class CpuFactory(object):
-    def __init__(self, platform_factory):
-        self._platform_factory = platform_factory
+    __metaclass__ = abc.ABCMeta
 
-    def create(self, architecture):
-        assert architecture in _architecture_map
-        return _architecture_map.get(architecture,
-                                     None)(self._platform_factory)
+    def create_cpu(self, architecture):
+        assert architecture in _cpu_map
+        return _cpu_map.get(architecture,
+                            None)(self)
+
+    @abc.abstractmethod
+    def create_register(self, cpu, register):
+        raise NotImplementedError
+
+
+class CpuRepository(object):
+    def __init__(self, cpu_factory):
+        self._cpu_factory = cpu_factory
+        self._cpus = {}
+
+    def get_cpu(self, architecture):
+        if architecture in self._cpus:
+            return self._cpus[architecture]
+        cpu = self._cpu_factory.create_cpu(architecture)
+        self._cpus[architecture] = cpu
+        return cpu
 
 
 def register_cpu(cls):
-    _architecture_map[cls.architecture()] = cls
+    _cpu_map[cls.architecture()] = cls
     return cls
 
-_architecture_map = {}
+_cpu_map = {}

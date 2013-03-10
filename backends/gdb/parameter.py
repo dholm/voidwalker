@@ -1,5 +1,5 @@
 # (void)walker GDB backend
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -100,12 +100,12 @@ class GdbParameterFactory(object):
         return GdbParameter()
 
     def create(self, parameter_type):
-        create_method = {EnumParameter: self.create_enum_parameter,
-                         IntegerParameter: self.create_integer_parameter,
-                         BooleanParameter: self.create_boolean_parameter,
-                         PrefixParameter: self.create_generic_parameter,
-                         Parameter: self.create_generic_parameter}
-        for ptype, create in create_method.iteritems():
+        create_method = [(EnumParameter, self.create_enum_parameter),
+                         (IntegerParameter, self.create_integer_parameter),
+                         (BooleanParameter, self.create_boolean_parameter),
+                         (PrefixParameter, self.create_generic_parameter),
+                         (Parameter, self.create_generic_parameter)]
+        for ptype, create in create_method:
             if issubclass(parameter_type, ptype):
                 return create(parameter_type)
 

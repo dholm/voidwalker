@@ -17,6 +17,7 @@
 from .cpu import Architecture
 from .cpu import Cpu
 from .cpu import CpuFactory
+from .cpu import CpuRepository
 from .cpu import Register
 from .cpu import create_static_register
 from .cpu import register_cpu

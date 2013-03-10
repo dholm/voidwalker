@@ -15,25 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from framework.target import Inferior
-from framework.target import TargetFactory
+from framework.target import InferiorFactory
 from framework.target import Thread
+from framework.target import ThreadFactory
 
 from .platform import TestCpu
-
-
-class TestThread(Thread):
-    def __init__(self, inferior_id, thread_id):
-        super(TestThread, self).__init__(inferior_id)
-        self._thread_id = thread_id
-
-    def name(self):
-        return ('thread %d' % self._thread_id)
-
-    def id(self):
-        return self._thread_id
-
-    def is_valid(self):
-        return True
+from .platform import TestCpuFactory
 
 
 class TestInferior(Inferior):
@@ -51,18 +38,40 @@ class TestInferior(Inferior):
         return None
 
     def write_memory(self, buf, address):
-        pass
+        return None
 
 
-class TestTargetFactory(TargetFactory, object):
-    def __init__(self, cpu_factory):
-        self._cpu_factory = cpu_factory
+class TestInferiorFactory(InferiorFactory):
+    def __init__(self):
+        super(TestInferiorFactory, self).__init__(TestCpuFactory())
 
-    def create_inferior(self, inferior_id):
-        cpu = self._cpu_factory.create(TestCpu.architecture())
+    def create_inferior(self, cpu, inferior_id):
         return TestInferior(cpu, inferior_id)
 
     def create_thread(self, inferior, thread_id):
         thread = TestThread(inferior.id(), thread_id)
         inferior.add_thread(thread)
         return thread
+
+
+class TestThread(Thread):
+    def __init__(self, inferior, thread_id):
+        super(TestThread, self).__init__(inferior)
+        self._thread_id = thread_id
+
+    def name(self):
+        return ('thread %d' % self._thread_id)
+
+    def id(self):
+        return self._thread_id
+
+    def is_valid(self):
+        return True
+
+
+class TestThreadFactory(ThreadFactory):
+    def create_thread(self, inferior, thread_id):
+        thread = TestThread(inferior, thread_id)
+        inferior.add_thread(thread)
+        return thread
+

@@ -151,16 +151,16 @@ class MipsCpu(Cpu):
                                       't8 t9 kt0 kt1 gp sp s9 ra').split()),
                               ('sp', ('lo hi bad pc').split())])
 
-    def __init__(self, platform_factory):
+    def __init__(self, cpu_factory):
         registers = OrderedDict()
         for group, register_list in self._registers.iteritems():
             registers[group] = [Register(x) for x in register_list]
         registers['sp'].append(CauseRegister('cause'))
         registers['sp'].append(StatusRegister('sr'))
-        super(MipsCpu, self).__init__(platform_factory, registers)
+        super(MipsCpu, self).__init__(cpu_factory, registers)
 
-    @staticmethod
-    def architecture():
+    @classmethod
+    def architecture(cls):
         return Architecture.Mips
 
     def stack_pointer(self):
