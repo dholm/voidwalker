@@ -29,7 +29,6 @@ from framework.interface import CommandBuilder
 from framework.interface import Configuration
 from framework.interface import ParameterBuilder
 from framework.patching import SnippetRepository
-from framework.platform import CpuFactory
 from framework.target import InferiorRepository
 
 from backends.gdb import GdbCommandFactory

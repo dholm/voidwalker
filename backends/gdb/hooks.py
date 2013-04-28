@@ -16,7 +16,7 @@
 
 import gdb
 
-from framework.interface.command import Command
+from framework.interface.command import StackCommand
 from framework.interface.command import register_command
 from framework.interface.parameter import BooleanParameter
 from framework.interface.parameter import PrefixParameter
@@ -61,7 +61,7 @@ class ContextHookParameter(BooleanParameter):
 
 
 @register_command
-class VoidwalkerHookStop(Command):
+class VoidwalkerHookStop(StackCommand):
     '''This command should be called from GDB hook-stop.
 
 To support all features of (void)walker this command must be called from GDB's

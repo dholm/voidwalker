@@ -61,7 +61,7 @@ data widget which displays it in hexadecimal and ascii form (when possible).'''
         address = abs(long(arguments[0]))
         size = abs(long(arguments[1]))
 
-        inferior = self._inferior_repository.inferior(thread.inferior_id())
+        inferior = thread.get_inferior()
         data_dump = inferior.read_memory(address, size)
         data_chunk = DataChunk(address, data_dump)
 
@@ -94,7 +94,7 @@ output.'''
         address = abs(long(arguments[0]))
         size = abs(long(arguments[1]))
 
-        inferior = self._inferior_repository.inferior(thread.inferior_id())
+        inferior = thread.get_inferior()
         listing = inferior.disassemble(address, size)
 
         section = Section('0x%016lX' % address)
