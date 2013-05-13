@@ -11,8 +11,9 @@ of GDB commands.
 
 ## Requirements
 
- * GDB 7.5 or later built with support for Python extensions.
- * FlowUI 0.2.1 or later.
+ * [GDB](http://www.gnu.org/software/gdb/) 7.5 or later built with support for
+   Python extensions.
+ * [FlowUI](https://github.com/dholm/FlowUI) 0.2.1 or later.
 
 Currently (void)walker has support for the following architectures, but adding
 new ones should be fairly easy at this point.
@@ -100,16 +101,6 @@ context* add the following line to ~/.gdbinit:
 Modifying what is performed when hooks are executed by GDB:
 
     voidwalker-hook-context <on/off>
-
-
-## Themes
-
-There is a theming system built in and the default theme is based on
-Ethan Schoonover's color palette known as
-[solarized](http://ethanschoonover.com/solarized).
-
-The [Zenburn](http://slinky.imukuppi.org/zenburnpage/) theme is included as
-well.
 
 
 ## License
