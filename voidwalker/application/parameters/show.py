@@ -1,4 +1,4 @@
-# (void)walker unit tests
+# (void)walker configuration parameters
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,18 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from unittest import TestCase
+from ...framework.interface.parameter import PrefixParameter
+from ...framework.interface.parameter import register_parameter
 
-from voidwalker.framework.patching import SnippetRepository
-
-import voidwalker.application.patching
+from .voidwalker import VoidwalkerParameter
 
 
-class SnippetsTest(TestCase):
-    def test_snippet_manager(self):
-        snippet_repository = SnippetRepository()
-        for name, snippet in snippet_repository.snippets():
-            print 'Snippet: %s %s' % (name, snippet.description())
-            for architecture in snippet.architectures():
-                implementation = snippet.implementation(architecture)
-                print '\t%s' % implementation.hex()
+@register_parameter
+class ShowParameter(PrefixParameter):
+    '''(void)walker show parameters'''
+
+    def __init__(self):
+        super(ShowParameter, self).__init__()
+
+    def default_value(self):
+        return None
+
+    @staticmethod
+    def name():
+        return '%s %s' % (VoidwalkerParameter.name(), 'show')

@@ -19,24 +19,24 @@ from flowui.terminals import SysTerminal
 from flowui.themes import Solarized
 from unittest import TestCase
 
-from framework.interface import BooleanParameter
-from framework.interface import CommandBuilder
-from framework.interface import Configuration
-from framework.interface import DataCommand
-from framework.interface import EnumParameter
-from framework.interface import Parameter
-from framework.interface import ParameterBuilder
-from framework.interface import PrefixCommand
-from framework.interface import register_command
-from framework.interface import register_parameter
-from framework.platform import CpuFactory
-from framework.target import InferiorRepository
+from voidwalker.framework.interface import BooleanParameter
+from voidwalker.framework.interface import CommandBuilder
+from voidwalker.framework.interface import Configuration
+from voidwalker.framework.interface import DataCommand
+from voidwalker.framework.interface import EnumParameter
+from voidwalker.framework.interface import Parameter
+from voidwalker.framework.interface import ParameterBuilder
+from voidwalker.framework.interface import PrefixCommand
+from voidwalker.framework.interface import register_command
+from voidwalker.framework.interface import register_parameter
+from voidwalker.framework.platform import CpuFactory
+from voidwalker.framework.target import InferiorRepository
 
-from backends.test import TestCommandFactory
-from backends.test import TestInferiorFactory
-from backends.test import TestParameterFactory
-from backends.test import TestPlatformFactory
-from backends.test import TestThreadFactory
+from voidwalker.backends.test import TestCommandFactory
+from voidwalker.backends.test import TestInferiorFactory
+from voidwalker.backends.test import TestParameterFactory
+from voidwalker.backends.test import TestPlatformFactory
+from voidwalker.backends.test import TestThreadFactory
 
 
 @register_command

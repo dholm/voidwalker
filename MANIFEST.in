@@ -1,0 +1,3 @@
+include voidwalker.py README.markdown run-tests.py description.rst
+recursive-include voidwalker/ *.py
+recursive-exclude voidwalker/ *.pyc

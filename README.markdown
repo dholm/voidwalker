@@ -29,10 +29,14 @@ Install the requirements using pip:
 
     pip install -r requirements.txt
 
-Put (void)walker somewhere on your system and simply add the following line to
-your *~/.gdbinit*:
+Install (void)walker using the supplied *setup.py* by executing:
 
-    python execfile('<path to voidwalker.py>')
+    python setup.py install
+
+Finally add the following line to your *~/.gdbinit* to have it loaded
+automatically whenever GDB is launched:
+
+    python from voidwalker import voidwalker
 
 The next time you start GDB you should see (void)walker being loaded.
 

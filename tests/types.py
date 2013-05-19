@@ -20,11 +20,11 @@ from flowui.terminals import SysTerminal
 from flowui.themes import Solarized
 from unittest import TestCase
 
-from framework.types.data import DataChunk
-from framework.types.data import DataWidget
-from framework.types.instructions import Instruction
-from framework.types.instructions import InstructionListing
-from framework.types.instructions import InstructionListingWidget
+from voidwalker.framework.types.data import DataChunk
+from voidwalker.framework.types.data import DataWidget
+from voidwalker.framework.types.instructions import Instruction
+from voidwalker.framework.types.instructions import InstructionListing
+from voidwalker.framework.types.instructions import InstructionListingWidget
 
 
 class WidgetsTest(TestCase):

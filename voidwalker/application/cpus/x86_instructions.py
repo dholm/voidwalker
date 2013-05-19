@@ -1,4 +1,4 @@
-# (void)walker unit tests
+# (void)walker x86 instructions
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,18 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from unittest import TestCase
-
-from voidwalker.framework.patching import SnippetRepository
-
-import voidwalker.application.patching
+from ...framework.patching.types import Instruction
 
 
-class SnippetsTest(TestCase):
-    def test_snippet_manager(self):
-        snippet_repository = SnippetRepository()
-        for name, snippet in snippet_repository.snippets():
-            print 'Snippet: %s %s' % (name, snippet.description())
-            for architecture in snippet.architectures():
-                implementation = snippet.implementation(architecture)
-                print '\t%s' % implementation.hex()
+@Instruction.factory
+def nop(instruction):
+    instruction.byte(0x90)
