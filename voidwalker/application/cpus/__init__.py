@@ -1,4 +1,4 @@
-# (void)walker unit tests
+# (void)walker CPU architecture support
 # Copyright (C) 2012 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -14,18 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from unittest import TestCase
+from .mips import MipsCpu
+from .x86 import X86Cpu
+from .x86_64 import X8664Cpu
 
-from voidwalker.framework.patching import SnippetRepository
-
-import voidwalker.application.patching
-
-
-class SnippetsTest(TestCase):
-    def test_snippet_manager(self):
-        snippet_repository = SnippetRepository()
-        for name, snippet in snippet_repository.snippets():
-            print 'Snippet: %s %s' % (name, snippet.description())
-            for architecture in snippet.architectures():
-                implementation = snippet.implementation(architecture)
-                print '\t%s' % implementation.hex()
+import mips_instructions
+import x86_instructions

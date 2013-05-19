@@ -16,16 +16,16 @@
 
 from unittest import TestCase
 
-from framework.platform import CpuFactory
-from framework.target import InferiorRepository
+from voidwalker.framework.platform import CpuFactory
+from voidwalker.framework.target import InferiorRepository
 
-from backends.test import TestPlatformFactory
-from backends.test import TestThreadFactory
-from backends.test import TestInferiorFactory
+from voidwalker.backends.test import TestPlatformFactory
+from voidwalker.backends.test import TestThreadFactory
+from voidwalker.backends.test import TestInferiorFactory
 
-from backends.test.platform import TestCpuFactory
-from backends.test.target import TestInferiorFactory
-from backends.test.target import TestThreadFactory
+from voidwalker.backends.test.platform import TestCpuFactory
+from voidwalker.backends.test.target import TestInferiorFactory
+from voidwalker.backends.test.target import TestThreadFactory
 
 
 class InferiorTest(TestCase):

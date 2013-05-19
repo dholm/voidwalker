@@ -1,5 +1,5 @@
-# (void)walker unit tests
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# (void)walker GDB backend
+# Copyright (C) 2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,18 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from unittest import TestCase
+import gdb
 
-from voidwalker.framework.patching import SnippetRepository
-
-import voidwalker.application.patching
+from ...framework.system.event import EventQueue
 
 
-class SnippetsTest(TestCase):
-    def test_snippet_manager(self):
-        snippet_repository = SnippetRepository()
-        for name, snippet in snippet_repository.snippets():
-            print 'Snippet: %s %s' % (name, snippet.description())
-            for architecture in snippet.architectures():
-                implementation = snippet.implementation(architecture)
-                print '\t%s' % implementation.hex()
+class GdbEventQueue(EventQueue):
+    def __init__(self):
+        super(GdbEventQueue, self).__init__()
+
+    def onEnqueue(self):
+        gdb.post_event(self)
+
+    def __call__(self):
+        if bool(self):
+            event = self.dequeue()
+            event()

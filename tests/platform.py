@@ -16,20 +16,20 @@
 
 from unittest import TestCase
 
-from framework.interface import Configuration
-from framework.platform import CpuFactory
-from framework.platform import CpuRepository
-from framework.target import InferiorRepository
+from voidwalker.framework.interface import Configuration
+from voidwalker.framework.platform import CpuFactory
+from voidwalker.framework.platform import CpuRepository
+from voidwalker.framework.target import InferiorRepository
 
-from application.cpus import MipsCpu
-from application.cpus import X8664Cpu
-from application.cpus import X86Cpu
+from voidwalker.application.cpus import MipsCpu
+from voidwalker.application.cpus import X8664Cpu
+from voidwalker.application.cpus import X86Cpu
 
-from backends.test import TestCpu
-from backends.test import TestCpuFactory
-from backends.test import TestInferiorFactory
-from backends.test import TestThreadFactory
-from backends.test import TestPlatformFactory
+from voidwalker.backends.test import TestCpu
+from voidwalker.backends.test import TestCpuFactory
+from voidwalker.backends.test import TestInferiorFactory
+from voidwalker.backends.test import TestThreadFactory
+from voidwalker.backends.test import TestPlatformFactory
 
 
 class CpuTest(TestCase):

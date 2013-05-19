@@ -3,3 +3,6 @@
 *_flymake.py
 *.pyc
 .coverage
+
+dist/
+build/
