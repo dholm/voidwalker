@@ -16,11 +16,12 @@
 
 import re
 
-from collections import OrderedDict
 from flowui import Widget
 from flowui.widgets.table import Cell
 from flowui.widgets.table import Row
 from flowui.widgets.table import Table
+
+from ..utils import OrderedDict
 
 
 class Instruction(object):

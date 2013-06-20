@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
-
 from ...framework.platform import Architecture
 from ...framework.platform import Context
 from ...framework.platform import Cpu
@@ -24,6 +22,7 @@ from ...framework.platform import PlatformFactory
 from ...framework.platform import Register
 from ...framework.platform import create_static_register
 from ...framework.platform import register_cpu
+from ...framework.utils import OrderedDict
 
 
 @register_cpu

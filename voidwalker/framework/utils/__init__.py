@@ -15,5 +15,5 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .enum import enum
-
+from .ordereddict import OrderedDict
 from .recipes import grouper

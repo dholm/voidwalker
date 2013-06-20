@@ -16,8 +16,7 @@
 
 import abc
 
-from collections import OrderedDict
-
+from ..utils import OrderedDict
 from ..utils import enum
 
 

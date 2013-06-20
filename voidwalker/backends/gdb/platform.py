@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 import gdb
 import re
 
@@ -23,6 +22,7 @@ from ...framework.platform import CpuFactory
 from ...framework.platform import PlatformFactory
 from ...framework.platform import create_static_register
 from ...framework.types import DataChunk
+from ...framework.utils import OrderedDict
 
 from ...application.parameters.context import ContextInstructionsParameter
 from ...application.parameters.context import ContextStackParameter
