@@ -18,6 +18,7 @@ import gdb
 import os.path
 import re
 
+from ...application.cpus.generic import GenericCpu
 from ...framework.platform import Architecture
 from ...framework.target.inferior import Inferior
 from ...framework.target.inferior import InferiorFactory
@@ -25,6 +26,7 @@ from ...framework.target.thread import Thread
 from ...framework.target.thread import ThreadFactory
 from ...framework.types.instructions import Instruction
 from ...framework.types.instructions import InstructionListing
+from ...framework.utils import OrderedDict
 
 
 class GdbThread(Thread):
@@ -114,6 +116,17 @@ class GdbInferiorFactory(InferiorFactory, object):
             return Architecture.Arm
         return None
 
+    def _registers(self):
+        info_registers = gdb.execute('info registers', False, True)
+        registers = OrderedDict([('gp', []), ('sp', ('sp pc').split())])
+        for line in info_registers.split('\n'):
+            words = line.split()
+            if not len(words) or words[0] in registers['sp']:
+                continue
+            registers['gp'].append(words[0])
+
+        return registers
+
     def create_inferior(self, inferior_id):
         gdb_inferior = None
         try:
@@ -131,11 +144,17 @@ class GdbInferiorFactory(InferiorFactory, object):
 
             inferior_path = os.path.abspath(inferior[2]).strip()
             matches = self._file_expression.findall(info_target)
-            target = (i[1] for i in matches
-                      if os.path.abspath(i[0]).strip() == inferior_path).next()
+            try:
+                target = (i[1] for i in matches
+                          if os.path.abspath(i[0]).strip() ==
+                          inferior_path).next()
 
-            architecture = self._target_to_architecture(target)
-            cpu = self._cpu_factory.create_cpu(architecture)
+                architecture = self._target_to_architecture(target)
+                cpu = self._cpu_factory.create_cpu(architecture)
+
+            except StopIteration:
+                registers = self._registers()
+                cpu = GenericCpu(self._cpu_factory, registers)
 
         except TypeError:
             return None

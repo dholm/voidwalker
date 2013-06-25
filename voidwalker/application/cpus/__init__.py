@@ -1,5 +1,5 @@
 # (void)walker CPU architecture support
-# Copyright (C) 2012 David Holm <dholmster@gmail.com>
+# Copyright (C) 2012-2013 David Holm <dholmster@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .generic import GenericCpu
 from .mips import MipsCpu
 from .x86 import X86Cpu
 from .x86_64 import X8664Cpu

@@ -20,7 +20,7 @@ from ..utils import OrderedDict
 from ..utils import enum
 
 
-Architecture = enum('Test', 'X86', 'X8664', 'Mips', 'Arm',
+Architecture = enum('Test', 'X86', 'X8664', 'Mips', 'Arm', 'Generic',
                     enum_type='Architecture')
 
 
