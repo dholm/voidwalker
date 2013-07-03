@@ -14,51 +14,60 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from flowui.terminal import AnsiTerminal
-from flowui.themes import Solarized
+import sys
+if 'voidwalker' not in sys.modules:
+    import inspect
+    import os.path
+    self_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
+    pkg_path = os.path.abspath(os.path.join(os.path.dirname(self_path),
+                                            os.pardir))
+    sys.path.insert(0, pkg_path)
+    from voidwalker import voidwalker
 
-from .framework.interface import CommandBuilder
-from .framework.interface import Configuration
-from .framework.interface import ParameterBuilder
-from .framework.patching import SnippetRepository
-from .framework.target import InferiorRepository
+else:
+    from flowui.terminal import AnsiTerminal
+    from flowui.themes import Solarized
 
-from .backends.gdb import GdbCommandFactory
-from .backends.gdb import GdbCpuFactory
-from .backends.gdb import GdbParameterFactory
-from .backends.gdb import GdbPlatformFactory
-from .backends.gdb import GdbInferiorFactory
-from .backends.gdb import GdbThreadFactory
-from .backends.gdb import GdbTerminal
+    from .framework.interface import CommandBuilder
+    from .framework.interface import Configuration
+    from .framework.interface import ParameterBuilder
+    from .framework.patching import SnippetRepository
+    from .framework.target import InferiorRepository
 
-from .application.patching import SnippetCommandBuilder
+    from .backends.gdb import GdbCommandFactory
+    from .backends.gdb import GdbCpuFactory
+    from .backends.gdb import GdbParameterFactory
+    from .backends.gdb import GdbPlatformFactory
+    from .backends.gdb import GdbInferiorFactory
+    from .backends.gdb import GdbThreadFactory
+    from .backends.gdb import GdbTerminal
 
-# Register all commands, parameters, cpus and themes
-from .backends.gdb import tools
-from . import application
+    from .application.patching import SnippetCommandBuilder
 
-from version import __version__
+    # Register all commands, parameters, cpus and themes
+    from .backends.gdb import tools
+    from . import application
 
+    from version import __version__
 
-class VoidwalkerBuilder(object):
-    def __init__(self, version):
-        config = Configuration()
-        ParameterBuilder(GdbParameterFactory(), config)
+    class VoidwalkerBuilder(object):
+        def __init__(self, version):
+            config = Configuration()
+            ParameterBuilder(GdbParameterFactory(), config)
 
-        snippet_repository = SnippetRepository()
-        SnippetCommandBuilder(snippet_repository)
+            snippet_repository = SnippetRepository()
+            SnippetCommandBuilder(snippet_repository)
 
-        platform_factory = GdbPlatformFactory()
-        inferior_factory = GdbInferiorFactory(GdbCpuFactory())
-        inferior_repository = InferiorRepository()
-        ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
-        CommandBuilder(GdbCommandFactory(), inferior_repository,
-                       platform_factory, inferior_factory, GdbThreadFactory(),
-                       config, ansi_terminal)
+            platform_factory = GdbPlatformFactory()
+            inferior_factory = GdbInferiorFactory(GdbCpuFactory())
+            inferior_repository = InferiorRepository()
+            ansi_terminal = AnsiTerminal(GdbTerminal(), Solarized())
+            CommandBuilder(GdbCommandFactory(), inferior_repository,
+                           platform_factory, inferior_factory,
+                           GdbThreadFactory(), config, ansi_terminal)
 
-        ansi_terminal.write(('%(face-underlined)s(void)walker%(face-normal)s '
-                             'v%(version)s installed\n'),
-                            {'version': version})
+            msg = ('%(face-underlined)s(void)walker%(face-normal)s '
+                   'v%(version)s installed\n')
+            ansi_terminal.write(msg, {'version': version})
 
-
-voidwalker_builder = VoidwalkerBuilder(__version__)
+    voidwalker_builder = VoidwalkerBuilder(__version__)
