@@ -15,28 +15,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import gdb
-import tempfile
 
 from flowui import Terminal
+from flowui.terminals import SysTerminal
 
 
 class GdbTerminal(Terminal):
-    def _get_depth(self):
-        tf = tempfile.NamedTemporaryFile(delete=True)
-        gdb.execute('shell tput colors >%s' % tf.name, False, True)
-        tf.flush()
-        try:
-            return int(tf.read().strip())
-        except ValueError:
-            return Terminal.DEFAULT_DEPTH
-
     def reset(self):
         pass
 
     def __init__(self):
         width = gdb.parameter('width')
         height = gdb.parameter('height')
-        depth = self._get_depth()
+
+        sys_terminal = SysTerminal()
+        depth = sys_terminal.depth()
+        if not width:
+            width = sys_terminal.width()
+        if not height:
+            height = sys_terminal.height()
+
         super(GdbTerminal, self).__init__(width, height, depth)
 
     def write(self, string, dictionary=None):
